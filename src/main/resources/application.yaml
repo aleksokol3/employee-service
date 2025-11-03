@@ -1,0 +1,18 @@
+spring:
+  application.name: employee-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/employeeservice
+    username: ${db.user}
+    password: ${db.password}
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          fetch_size: 50
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+  liquibase:
+    url: jdbc:postgresql://localhost:5432/employeeservice
+    user: ${db.user}
+    password: ${db.password}
