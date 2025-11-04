@@ -9,7 +9,7 @@
 -- Versioning strategy: Semantic Versioning
 CREATE TABLE employee
 (
-    id          VARCHAR(36) PRIMARY KEY,
+    id          UUID PRIMARY KEY,
     first_name  VARCHAR(256)             NOT NULL,
     last_name   VARCHAR(256)             NOT NULL,
     age         INT                      NOT NULL CHECK ( age > 0 ),

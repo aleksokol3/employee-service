@@ -12,7 +12,6 @@ import org.hibernate.annotations.UuidGenerator;
 @Entity
 @Data
 public class Employee {
-
     @Id
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     private UUID id;
