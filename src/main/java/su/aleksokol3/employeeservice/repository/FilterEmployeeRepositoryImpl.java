@@ -14,58 +14,28 @@ import java.util.List;
 public class FilterEmployeeRepositoryImpl implements FilterEmployeeRepository {
 
     private final EntityManager entityManager;
-    @Override
-    public List<Employee> findByFilter(EmployeeFilter filter) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Employee> criteria = cb.createQuery(Employee.class);
-        Root<Employee> employee = criteria.from(Employee.class);
-        List<Predicate> predicates = new ArrayList<>();
-        if (filter.firstName() != null) {
-            predicates.add(cb.like(employee.get("firstName"), filter.firstName()));
-        }
-        if (filter.lastName() != null) {
-            predicates.add(cb.like(employee.get("lastName"), filter.lastName()));
-        }
-        if (filter.age() != null) {
-            predicates.add(cb.equal(employee.get("age"), filter.age()));
-        }
-        if (filter.salary() != null) {
-            predicates.add(cb.equal(employee.get("salary"), filter.salary()));
-        }
-        if (filter.hiringDate() != null) {
-            predicates.add(cb.equal(employee.get("hiringDate"), filter.hiringDate()));
-        }
-        criteria.select(employee).where(predicates.toArray(Predicate[]::new));
-
-        return entityManager.createQuery(criteria).getResultList();
-    }
 
     @Override
     public List<Employee> findByFilter(EmployeeFilter filter, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Employee> criteria = cb.createQuery(Employee.class);
         Root<Employee> employee = criteria.from(Employee.class);
-        List<Predicate> predicates = new ArrayList<>();
-        if (filter.firstName() != null) {
-            predicates.add(cb.like(employee.get("firstName"), filter.firstName()));
+        List<Predicate> predicates = createPredicates(filter, cb, employee);
+        criteria.select(employee);
+//        if (!predicates.isEmpty()) {
+//            criteria.where(predicates.toArray(Predicate[]::new));
+//        }
+        criteria.where(predicates.toArray(Predicate[]::new));
+        int offset = 0;
+        int limit = 10;
+        if (pageable != null) {
+            offset = pageable.getPageNumber() * pageable.getPageSize();
+            limit = pageable.getPageSize();
         }
-        if (filter.lastName() != null) {
-            predicates.add(cb.like(employee.get("lastName"), filter.lastName()));
-        }
-        if (filter.age() != null) {
-            predicates.add(cb.equal(employee.get("age"), filter.age()));
-        }
-        if (filter.salary() != null) {
-            predicates.add(cb.equal(employee.get("salary"), filter.salary()));
-        }
-        if (filter.hiringDate() != null) {
-            predicates.add(cb.equal(employee.get("hiringDate"), filter.hiringDate()));
-        }
-        criteria.select(employee).where(predicates.toArray(Predicate[]::new));
 
         return entityManager.createQuery(criteria)
-                .setFirstResult(pageable.getPageNumber())
-                .setMaxResults(pageable.getPageSize())
+                .setFirstResult(offset)
+                .setMaxResults(limit)
                 .getResultList();
     }
 
@@ -73,9 +43,20 @@ public class FilterEmployeeRepositoryImpl implements FilterEmployeeRepository {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaDelete<Employee> criteria = cb.createCriteriaDelete(Employee.class);
         Root<Employee> employee = criteria.from(Employee.class);
+        List<Predicate> predicates = createPredicates(filter, cb, employee);
+        criteria.where(predicates.toArray(Predicate[]::new));
+
+        entityManager.createQuery(criteria).executeUpdate();
+    }
+
+    private List<Predicate> createPredicates(EmployeeFilter filter, CriteriaBuilder cb, Root<Employee> employee) {
+
         List<Predicate> predicates = new ArrayList<>();
         if (filter.firstName() != null) {
             predicates.add(cb.like(employee.get("firstName"), filter.firstName()));
+        }
+        if (filter.patronymic() != null) {
+            predicates.add(cb.like(employee.get("patronymic"), filter.patronymic()));
         }
         if (filter.lastName() != null) {
             predicates.add(cb.like(employee.get("lastName"), filter.lastName()));
@@ -89,8 +70,6 @@ public class FilterEmployeeRepositoryImpl implements FilterEmployeeRepository {
         if (filter.hiringDate() != null) {
             predicates.add(cb.equal(employee.get("hiringDate"), filter.hiringDate()));
         }
-        criteria.where(predicates.toArray(Predicate[]::new));
-
-        entityManager.createQuery(criteria).executeUpdate();
+        return predicates;
     }
 }

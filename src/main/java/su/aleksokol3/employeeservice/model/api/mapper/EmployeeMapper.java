@@ -15,5 +15,7 @@ public interface EmployeeMapper {
 
     Employee createDtoToEntity(CreateEmployeeDto dto);
 
-    Employee patchDtoToEntity(PatchEmployeeDto dto);
+//    default Employee patchDtoToEntity(PatchEmployeeDto dto) {
+//        return new Employee();
+//    }
 }

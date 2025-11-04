@@ -1,6 +1,8 @@
 package su.aleksokol3.employeeservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
@@ -21,8 +23,8 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public List<ReadEmployeeDto> findBy(EmployeeFilter filter) {
-        return employeeService.findBy(filter, null);
+    public List<ReadEmployeeDto> findBy(EmployeeFilter filter, Pageable pageable) {
+        return employeeService.findBy(filter, pageable);
     }
 
     @GetMapping("/{id}")
@@ -31,7 +33,7 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreateEmployeeDto dto) {
+    public ResponseEntity<?> create(@RequestBody @Valid CreateEmployeeDto dto) {
         UUID uuid = employeeService.create(dto);
         return ResponseEntity.created(URI.create("localhost:8080/api/v1/employees/" + uuid))
                 .body(uuid);
@@ -40,7 +42,7 @@ public class EmployeeController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody PatchEmployeeDto dto) {
+    public ResponseEntity<?> update(@PathVariable UUID id, @RequestBody @Valid PatchEmployeeDto dto) {
         employeeService.update(id, dto);
         return ResponseEntity.ok().build();
     }

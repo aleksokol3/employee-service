@@ -9,7 +9,6 @@ import java.util.List;
 
 //@Repository
 public interface FilterEmployeeRepository {
-    List<Employee> findByFilter(EmployeeFilter filter);
 
     List<Employee> findByFilter(EmployeeFilter filter, Pageable pageable);
 

@@ -1,13 +1,23 @@
 package su.aleksokol3.employeeservice.model.api.dto.employee;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.UUID;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
+import org.openapitools.jackson.nullable.JsonNullable;
 
-public record PatchEmployeeDto(UUID id,
-                               String firstName,
-                               String lastName,
-                               Integer age,
-                               BigDecimal salary,
-                               Instant hiringDate) {
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record PatchEmployeeDto(
+        @NotBlank
+        JsonNullable<String> firstName,
+        JsonNullable<String> patronymic,
+        @NotBlank
+        JsonNullable<String> lastName,
+        @Min(1)
+        JsonNullable<Integer> age,
+        @Min(0)
+        JsonNullable<BigDecimal> salary,
+        JsonNullable<LocalDate> hiringDate
+) {
 }
