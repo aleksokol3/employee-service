@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
@@ -23,13 +24,17 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public List<ReadEmployeeDto> findBy(EmployeeFilter filter, Pageable pageable) {
-        return employeeService.findBy(filter, pageable);
+    public ResponseEntity<List<ReadEmployeeDto>> findBy(EmployeeFilter filter, Pageable pageable) {
+        return ResponseEntity.ok()
+                .body(employeeService.findBy(filter, pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(employeeService.findById(id));
+    public ResponseEntity<ReadEmployeeDto> findById(@PathVariable UUID id) {
+        String location = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
+        return ResponseEntity.ok()
+                .header("location", location)
+                .body(employeeService.findById(id));
     }
 
     @PostMapping
@@ -37,8 +42,6 @@ public class EmployeeController {
         UUID uuid = employeeService.create(dto);
         return ResponseEntity.created(URI.create("localhost:8080/api/v1/employees/" + uuid))
                 .body(uuid);
-
-        // return optional.map(content -> ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).body(content)).orElseGet(ResponseEntity.notFound()::build);
     }
 
     @PatchMapping("/{id}")

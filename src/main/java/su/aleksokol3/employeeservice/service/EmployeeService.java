@@ -10,7 +10,6 @@ import su.aleksokol3.employeeservice.model.api.filter.EmployeeFilter;
 import java.util.List;
 import java.util.UUID;
 
-//@Service
 @Transactional(readOnly = true)
 public interface EmployeeService {
     List<ReadEmployeeDto> findBy(EmployeeFilter filter, Pageable pageable);

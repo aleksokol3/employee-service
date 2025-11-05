@@ -2,7 +2,7 @@ package su.aleksokol3.employeeservice.model.api.dto.employee;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.math.BigDecimal;
@@ -11,6 +11,7 @@ import java.time.LocalDate;
 public record PatchEmployeeDto(
         @NotBlank
         JsonNullable<String> firstName,
+        @Size(min = 1, max = 256)
         JsonNullable<String> patronymic,
         @NotBlank
         JsonNullable<String> lastName,

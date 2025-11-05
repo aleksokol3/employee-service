@@ -3,7 +3,6 @@ package su.aleksokol3.employeeservice.model.api.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
-import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 
@@ -15,7 +14,4 @@ public interface EmployeeMapper {
 
     Employee createDtoToEntity(CreateEmployeeDto dto);
 
-//    default Employee patchDtoToEntity(PatchEmployeeDto dto) {
-//        return new Employee();
-//    }
 }
