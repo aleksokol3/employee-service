@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    hikari:
+      #      maximum-pool-size: 10                        # максимальное количество соединений в пуле (включая используемые и простаивающие)
+      #      minimum-idle:  =maximum-pool-size            # минимальное количество соединений, поддерживаемых в пуле в режиме простоя
+      #      idle-timeout: 600000 (min allowed = 10000)   # время в миллисекундах, по истечении которого незанятое соединение удаляется из пула
+      #      max-lifetime: 180000 (min allowed = 30000)   # максимальное время жизни соединения в пуле (предотвращает проблемы со старыми соединениями)
+      #      connection-timeout: 30000                    # максимальное время ожидания соединения из пула
+      #      keepalive-time: 120000 (min allowed = 30000), д.б. < max-lifetime        # сколько времени HikariCP будет пытаться поддерживать соединение активным.
+      #      validation-timeout: 5000 (min allowed = 250), д.б. < connection-timeout  # максимальное время для проверки работоспособности соединения.
+      maximum-pool-size: 20
+      minimum-idle: 10
+      idle-timeout: 30000
+      max-lifetime: 1800000         # полчаса
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql: true
+        jdbc:
+          fetch_size: 200
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+logging:
+  level:
+    org.hibernate.sql: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+#    com.zaxxer.hikari: TRACE
+#    com.zaxxer.hikari.HikariConfig: DEBUG

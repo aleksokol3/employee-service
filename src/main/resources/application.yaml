@@ -1,18 +1,20 @@
 spring:
   application.name: employee-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/employeeservice
-    username: ${db.user}
-    password: ${db.password}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     properties:
       hibernate:
         jdbc:
-          fetch_size: 50
+          fetch_size: 200
           batch_size: 50
         order_inserts: true
         order_updates: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
-    url: jdbc:postgresql://localhost:5432/employeeservice
-    user: ${db.user}
-    password: ${db.password}
+    enabled: true
+    change-log: classpath:db/changelog/changelog-master.yaml
+  profiles:
+    active: dev

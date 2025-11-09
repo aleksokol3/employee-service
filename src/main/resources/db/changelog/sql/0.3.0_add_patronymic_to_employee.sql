@@ -7,8 +7,8 @@
 -- AUTHOR: Aleksey Sokolov
 -- Date: 2025.11.04
 -- Versioning strategy: Semantic Versioning
-ALTER TABLE employee
-    ADD COLUMN patronymic VARCHAR(256);
-ALTER TABLE employee
-ALTER COLUMN hiring_date TYPE DATE
---rollback ALTER TABLE employee DROP COLUMN IF EXISTS patronymic;
+ALTER TABLE IF EXISTS employee
+    ADD COLUMN IF NOT EXISTS patronymic VARCHAR(256);
+ALTER TABLE IF EXISTS employee
+    ALTER COLUMN hiring_date TYPE DATE;
+-- Rollback ALTER TABLE employee DROP COLUMN IF EXISTS patronymic;

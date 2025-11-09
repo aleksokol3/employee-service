@@ -1,8 +1,11 @@
 package su.aleksokol3.employeeservice.model.api.dto.employee;
 
 import jakarta.validation.constraints.*;
+import lombok.Builder;
+
 import java.math.BigDecimal;
 
+@Builder
 public record CreateEmployeeDto(
         @NotBlank
         @Size(min = 1, max = 256)

@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 20
+      idle-timeout: 30000
+      max-lifetime: 3600000             # 1 час
+      auto-commit: false                # default = true
+      leak-detection-threshold: 60000   # default = 0 (disabled), min allowed = 2000
+      data-source-properties:
+        cachePrepStmts: true            # default = false
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        userServerPrepStmts: true       # default = false ?for newer versions of MySQL
+        rewriteBatchedInserts: true
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          fetch_size: 400
+          batch_size: 100
+        order_inserts: true
+        order_updates: true

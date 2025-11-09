@@ -19,7 +19,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/employees")
 @RequiredArgsConstructor
-public class EmployeeController {
+class EmployeeController {
 
     private final EmployeeService employeeService;
 

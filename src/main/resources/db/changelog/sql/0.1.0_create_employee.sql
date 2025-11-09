@@ -3,17 +3,17 @@
 --changeset aleksokol3:1 dbms:postgresql
 --preconditions onFail:HALT onError:HALT
 
--- Change description: create table employee
+-- Change description: (T-001): create table employee
 -- AUTHOR: Aleksey Sokolov
 -- Date: 2025.11.03
 -- Versioning strategy: Semantic Versioning
-CREATE TABLE employee
+CREATE TABLE IF NOT EXISTS employee
 (
-    id          UUID PRIMARY KEY,
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name  VARCHAR(256)             NOT NULL,
     last_name   VARCHAR(256)             NOT NULL,
     age         INT                      NOT NULL CHECK ( age > 0 ),
     salary      DECIMAL(19, 4)           NOT NULL CHECK ( salary >= 0 ),
     hiring_date TIMESTAMP WITH TIME ZONE NOT NULL
 );
---rollback DROP TABLE IF EXISTS employee
+-- Rollback DROP TABLE IF EXISTS employee

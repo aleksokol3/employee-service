@@ -42,8 +42,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public UUID create(@Valid CreateEmployeeDto dto) {
         Employee employee = employeeMapper.createDtoToEntity(dto);
         employee.setHiringDate(LocalDate.from(Instant.now().atZone(ZoneOffset.UTC)));
-        employeeRepository.saveAndFlush(employee);
-        return employee.getId();
+        Employee savedEmployee = employeeRepository.save(employee);
+        return savedEmployee.getId();
     }
 
     @Override
