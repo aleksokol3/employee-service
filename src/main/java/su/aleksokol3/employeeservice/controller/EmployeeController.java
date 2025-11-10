@@ -1,8 +1,10 @@
 package su.aleksokol3.employeeservice.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -24,7 +26,7 @@ class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public ResponseEntity<List<ReadEmployeeDto>> findBy(EmployeeFilter filter, Pageable pageable) {
+    public ResponseEntity<List<ReadEmployeeDto>> findBy(@Valid EmployeeFilter filter, @NotNull @PageableDefault Pageable pageable) {
         return ResponseEntity.ok()
                 .body(employeeService.findBy(filter, pageable));
     }
@@ -51,7 +53,7 @@ class EmployeeController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteBy(EmployeeFilter filter) {
+    public ResponseEntity<?> deleteBy(@Valid EmployeeFilter filter) {
         employeeService.deleteBy(filter);
         return ResponseEntity.noContent().build();
     }

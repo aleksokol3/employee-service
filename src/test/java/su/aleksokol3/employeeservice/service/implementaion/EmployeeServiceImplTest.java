@@ -100,7 +100,6 @@ class EmployeeServiceImplTest {
     @DisplayName("Test save employee functionality")
     void givenEmployee_whenSaveEmployee_thenRepositoryIsCalled() {
         // given
-//        Employee employeeToSave = DataUtils.getJuanRodriguezTransient();
         CreateEmployeeDto createEmployeeDto = DataUtils.getJuanRodriguezCreateDto();
         Employee employeePersisted = DataUtils.getJuanRodriguezPersisted();
         Mockito.when(employeeRepository.save(any(Employee.class))).thenReturn(employeePersisted);
@@ -140,7 +139,7 @@ class EmployeeServiceImplTest {
         Mockito.when(employeeRepository.save(any(Employee.class)))
                 .thenReturn(employeePersisted);
         // when
-//        serviceUnderTest.update(employeePersisted.getId(), patchEmployeeDto);
+        serviceUnderTest.update(employeePersisted.getId(), patchEmployeeDto);
         Employee updatedEmployee = employeeRepository.findById(employeePersisted.getId()).orElse(null);
 
         // then

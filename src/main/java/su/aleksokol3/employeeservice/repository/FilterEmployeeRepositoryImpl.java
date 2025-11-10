@@ -26,12 +26,12 @@ public class FilterEmployeeRepositoryImpl implements FilterEmployeeRepository {
 //            criteria.where(predicates.toArray(Predicate[]::new));
 //        }
         criteria.where(predicates.toArray(Predicate[]::new));
-        int offset = 0;
-        int limit = 10;
-        if (pageable != null) {
-            offset = pageable.getPageNumber() * pageable.getPageSize();
-            limit = pageable.getPageSize();
-        }
+        int offset = pageable.getPageNumber() * pageable.getPageSize();
+        int limit = pageable.getPageSize();
+//        if (pageable != null) {
+//            offset = pageable.getPageNumber() * pageable.getPageSize();
+//            limit = pageable.getPageSize();
+//        }
 
         return entityManager.createQuery(criteria)
                 .setFirstResult(offset)
@@ -61,15 +61,15 @@ public class FilterEmployeeRepositoryImpl implements FilterEmployeeRepository {
         if (filter.lastName() != null) {
             predicates.add(cb.like(employee.get("lastName"), filter.lastName()));
         }
-        if (filter.age() != null) {
-            predicates.add(cb.equal(employee.get("age"), filter.age()));
-        }
-        if (filter.salary() != null) {
-            predicates.add(cb.equal(employee.get("salary"), filter.salary()));
-        }
-        if (filter.hiringDate() != null) {
-            predicates.add(cb.equal(employee.get("hiringDate"), filter.hiringDate()));
-        }
+//        if (filter.age() != null) {
+//            predicates.add(cb.equal(employee.get("age"), filter.age()));
+//        }
+//        if (filter.salary() != null) {
+//            predicates.add(cb.equal(employee.get("salary"), filter.salary()));
+//        }
+//        if (filter.hiringDate() != null) {
+//            predicates.add(cb.equal(employee.get("hiringDate"), filter.hiringDate()));
+//        }
         return predicates;
     }
 }

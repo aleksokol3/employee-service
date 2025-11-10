@@ -2,8 +2,10 @@ package su.aleksokol3.employeeservice.model.api.dto.employee;
 
 import jakarta.validation.constraints.*;
 import lombok.Builder;
+import org.aspectj.lang.annotation.After;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Builder
 public record CreateEmployeeDto(
@@ -24,6 +26,9 @@ public record CreateEmployeeDto(
 
         @NotNull
         @Min(0)
-        BigDecimal salary
+        BigDecimal salary,
+
+        @NotNull
+        LocalDate hiringDate
         ) {
 }

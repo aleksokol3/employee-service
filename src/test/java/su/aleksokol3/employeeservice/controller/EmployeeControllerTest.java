@@ -75,7 +75,6 @@ class EmployeeControllerTest {
     void givenIncorrectId_whenFindById_thenExceptionIsThrown() throws Exception {
         // given
         UUID id = UUID.fromString("11e5eb40-472e-30d2-9591-036287d20258");
-        ReadEmployeeDto dto = DataUtils.getJuanRodriguezReadDto();
         Mockito.when(employeeService.findById(any(UUID.class)))
                 .thenThrow(new NotFoundException(HttpStatus.NOT_FOUND, "Пользователь с id %s не найден".formatted(id)));
         // when
@@ -163,7 +162,6 @@ class EmployeeControllerTest {
         // then
         result.andExpect(status().isOk());
         verify(employeeService, times(1)).update(any(UUID.class), any(PatchEmployeeDto.class));
-
     }
 
     @Test

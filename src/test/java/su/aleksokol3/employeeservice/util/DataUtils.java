@@ -12,27 +12,6 @@ import java.util.UUID;
 
 public class DataUtils {
 
-//    public static Employee getIvanPetrovTransient() {
-//        return Employee.builder()
-//                .firstName("Иван")
-//                .patronymic("Семёнович")
-//                .lastName("Петров")
-//                .age(30)
-//                .salary(BigDecimal.valueOf(321.45))
-//                .hiringDate(LocalDate.of(2015, 1, 1))
-//                .build();
-//    }
-//    public static Employee getIvanPetrovPersisted() {
-//        return Employee.builder()
-//                .id(UUID.fromString("00e5eb40-472e-40d2-9591-036287d20258"))
-//                .firstName("Иван")
-//                .patronymic("Семёнович")
-//                .lastName("Петров")
-//                .age(30)
-//                .salary(BigDecimal.valueOf(321.45))
-//                .hiringDate(LocalDate.of(2015, 1, 1))
-//                .build();
-//    }
     public static Employee getJuanRodriguezTransient() {
         return Employee.builder()
                 .firstName("Juan")
@@ -58,7 +37,7 @@ public class DataUtils {
                 .lastName("Rodriguez")
                 .age(40)
                 .salary(BigDecimal.valueOf(222.22))
-//                .hiringDate(LocalDate.of(2020, 10, 15))
+                .hiringDate(LocalDate.of(2020, 10, 15))
                 .build();
     }
     public static CreateEmployeeDto getJuanRodriguezInvalidCreateDto() {
@@ -68,7 +47,7 @@ public class DataUtils {
                 .lastName("Rodriguez")
                 .age(-40)
                 .salary(BigDecimal.valueOf(222.22))
-//                .hiringDate(LocalDate.of(2020, 10, 15))
+                .hiringDate(LocalDate.of(2020, 10, 15))
                 .build();
     }
     public static PatchEmployeeDto getJuanRodriguezPatchDto() {
@@ -77,7 +56,7 @@ public class DataUtils {
                 .patronymic(JsonNullable.undefined())
                 .lastName(JsonNullable.undefined())
                 .age(JsonNullable.undefined())
-                .salary(JsonNullable.of(BigDecimal.valueOf(777.55)))
+                .salary(JsonNullable.of(BigDecimal.valueOf(777.77)))
                 .hiringDate(JsonNullable.undefined())
                 .build();
     }
