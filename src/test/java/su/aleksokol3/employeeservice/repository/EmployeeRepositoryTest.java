@@ -9,7 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 import su.aleksokol3.employeeservice.UnitTestBase;
-import su.aleksokol3.employeeservice.model.api.filter.EmployeeFilter;
+import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
+import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.util.DataUtils;
 
@@ -73,7 +74,7 @@ public class EmployeeRepositoryTest extends UnitTestBase {
         Employee ivanAlonsoTransient = DataUtils.getIvanAlonsoTransient();
         employeeRepository.saveAll(List.of(juanRodriguezTransient, luisHernandezTransient, mariaAlonsoTransient, ivanAlonsoTransient));
 
-        EmployeeFilter filter = EmployeeFilter.builder()
+        SearchEmployeeFilter filter = SearchEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
         Pageable pageable = PageRequest.of(0, 5);
@@ -136,12 +137,12 @@ public class EmployeeRepositoryTest extends UnitTestBase {
 
         employeeRepository.saveAll(List.of(juanRodriguezTransient, luisHernandezTransient, mariaAlonsoTransient, ivanAlonsoTransient));
 
-        EmployeeFilter filter = EmployeeFilter.builder()
+        DeleteEmployeeFilter filter = DeleteEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
         // when
         employeeRepository.deleteByFilter(filter);
-        EmployeeFilter findAllFilter = EmployeeFilter.builder().build();
+        SearchEmployeeFilter findAllFilter = SearchEmployeeFilter.builder().build();
         List<Employee> byFilter = employeeRepository.findByFilter(findAllFilter, PageRequest.of(0, 10));
         // then
         assertThat(byFilter).isNotNull();

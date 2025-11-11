@@ -5,22 +5,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import org.openapitools.jackson.nullable.JsonNullable;
+import su.aleksokol3.employeeservice.validation.NotBlankOrNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Builder
 public record PatchEmployeeDto(
-        @NotBlank
-        JsonNullable<String> firstName,
-        @Size(min = 1, max = 256)
-        JsonNullable<String> patronymic,
-        @NotBlank
-        JsonNullable<String> lastName,
-        @Min(1)
-        JsonNullable<Integer> age,
-        @Min(0)
-        JsonNullable<BigDecimal> salary,
+//        @NotBlank - аннотация над JsonNullable'ом - работает так же
+        JsonNullable<@NotBlank String> firstName,
+        JsonNullable<@Size(min = 1, max = 256) @NotBlankOrNull String> patronymic,
+        JsonNullable<@NotBlank String> lastName,
+        JsonNullable<@Min(1) Integer> age,
+        JsonNullable<@Min(0) BigDecimal> salary,
         JsonNullable<LocalDate> hiringDate
 ) {
 }

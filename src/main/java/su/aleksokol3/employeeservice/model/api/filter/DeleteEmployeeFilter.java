@@ -1,38 +1,34 @@
 package su.aleksokol3.employeeservice.model.api.filter;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
+import su.aleksokol3.employeeservice.validation.Age;
+import su.aleksokol3.employeeservice.validation.HiringDate;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Builder
-public record EmployeeFilter(
-        @NotBlank
+@Age
+@HiringDate
+public record DeleteEmployeeFilter(
+
         @Size(min = 1, max = 256)
         String firstName,
 
         @Size(min = 1, max = 256)
         String patronymic,
 
-        @NotBlank
         @Size(min = 1, max = 256)
         String lastName,
 
         @Min(1)
-        Integer ageBefore,
+        Integer ageFrom,
+
         @Min(1)
-        Integer ageAfter,
+        Integer ageTo,
 
-        @Min(0)
-        BigDecimal salaryBefore,
+        LocalDate hiringDateFrom,
 
-        @Min(0)
-        BigDecimal salaryAfter,
-
-        LocalDate hiringDateBefore,
-
-        LocalDate hiringDateAfter) {
+        LocalDate hiringDateTo)  {
 }

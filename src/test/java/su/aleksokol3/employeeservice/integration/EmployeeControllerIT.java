@@ -1,48 +1,31 @@
 package su.aleksokol3.employeeservice.integration;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.result.PrintingResultHandler;
 import su.aleksokol3.employeeservice.IntegrationTestBase;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
-import su.aleksokol3.employeeservice.model.api.exception.NotFoundException;
-import su.aleksokol3.employeeservice.model.api.filter.EmployeeFilter;
+import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.api.mapper.EmployeeMapper;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.repository.EmployeeRepository;
-import su.aleksokol3.employeeservice.service.EmployeeService;
 import su.aleksokol3.employeeservice.util.DataUtils;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -72,7 +55,6 @@ class EmployeeControllerIT extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON));
         // then
         ReadEmployeeDto dto = EmployeeMapper.INSTANCE.entityToReadDto(employeeRepository.findById(savedEntity.getId()).get());
-        System.out.println(dto);
 
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", CoreMatchers.is(entity.getId().toString())))
@@ -109,7 +91,7 @@ class EmployeeControllerIT extends IntegrationTestBase {
         Employee entityTransient3 = DataUtils.getMariaAlonsoTransient();
         employeeRepository.saveAll(List.of(entityTransient1, entityTransient2, entityTransient3));
 
-        EmployeeFilter filter = EmployeeFilter.builder().lastName("Alonso").build();
+        SearchEmployeeFilter filter = SearchEmployeeFilter.builder().lastName("Alonso").build();
         // when
         ResultActions result = mockMvc.perform(
                 get("/api/v1/employees")
@@ -207,10 +189,10 @@ class EmployeeControllerIT extends IntegrationTestBase {
                 luisHernandezTransient,
                 mariaAlonsoTransient,
                 ivanAlonsoTransient));
-        EmployeeFilter filter = EmployeeFilter.builder()
+        SearchEmployeeFilter filter = SearchEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
-        EmployeeFilter findAllFilter = EmployeeFilter.builder().build();
+        SearchEmployeeFilter findAllFilter = SearchEmployeeFilter.builder().build();
                                     System.out.println(objectMapper.writeValueAsString(filter));
         // when
         ResultActions result = mockMvc.perform(

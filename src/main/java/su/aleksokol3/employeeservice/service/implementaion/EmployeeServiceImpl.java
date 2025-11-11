@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import su.aleksokol3.employeeservice.model.api.dto.PageList;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.exception.NotFoundException;
-import su.aleksokol3.employeeservice.model.api.filter.EmployeeFilter;
+import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
+import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.api.mapper.EmployeeMapper;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.repository.EmployeeRepository;
@@ -27,9 +29,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private static final EmployeeMapper employeeMapper = EmployeeMapper.INSTANCE;
     @Override
-    public List<ReadEmployeeDto> findBy(EmployeeFilter filter, Pageable pageable) {
+    public PageList<ReadEmployeeDto> findBy(SearchEmployeeFilter filter, Pageable pageable) {
         List<Employee> byFilter = employeeRepository.findByFilter(filter, pageable);
-        return byFilter.stream().map(employeeMapper::entityToReadDto).toList();
+        PageList<ReadEmployeeDto> pageList = new PageList<>(new ArrayList<>(), 0, Instant.now());
+        byFilter.forEach(
+                employee -> {
+                    ReadEmployeeDto readEmployeeDto = employeeMapper.entityToReadDto(employee);
+                    pageList.getReadDtoList().add(readEmployeeDto);
+                    pageList.setTotal(pageList.getTotal() + 1);
+                }
+        );
+        return pageList;
     }
 
     @Override
@@ -68,7 +78,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void deleteBy(EmployeeFilter filter) {
+    public void deleteBy(DeleteEmployeeFilter filter) {
         employeeRepository.deleteByFilter(filter);
     }
 }

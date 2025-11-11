@@ -7,7 +7,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.PostgreSQLContainer;
-import su.aleksokol3.employeeservice.annotation.IT;
 
 @ActiveProfiles("test")
 @SpringBootTest                     // создаёт и загружает полный ApplicationContext
