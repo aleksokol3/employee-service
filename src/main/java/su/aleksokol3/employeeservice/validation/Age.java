@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Age {
-    String message() default "age range";
+    String message() default "{age.range}";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };
 }

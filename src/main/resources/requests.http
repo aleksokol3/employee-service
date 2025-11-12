@@ -1,0 +1,3 @@
+# GET by filter with default pageable / DELETE by filter
+    localhost:8080/api/v1/employees?ageFrom=40&ageTo=111&firstName=Jo
+#

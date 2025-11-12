@@ -1,14 +1,15 @@
-package su.aleksokol3.employeeservice.model.api.exceptionhandler;
+package su.aleksokol3.employeeservice.exception;
 
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.*;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import su.aleksokol3.employeeservice.model.api.exception.NotFoundException;
 
 import java.time.Instant;
 import java.util.*;
@@ -26,7 +27,7 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         List<String> errors = ex.getFieldErrors()
                 .stream()
                 .sorted(Comparator.comparing(FieldError::getField))
-                .map(field -> field.getField().toUpperCase() + ": " + field.getDefaultMessage())
+                .map(field -> field.getField() + ": " + field.getDefaultMessage())
                 .collect(Collectors.toList());
         body.put("errors", errors);
         body.put("path", ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
@@ -34,11 +35,27 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         return ResponseEntity.badRequest().body(body);
     }
 
+    @Override
+    protected ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("status", status.value());
+
+        List<String> errors = ex.getAllErrors()
+                .stream()
+                .map(MessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toList());
+        body.put("errors", errors);
+        body.put("path", ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
+        return ResponseEntity.badRequest().body(body);
+    }
+
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleNotFoundException(NotFoundException ex) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now());
-        body.put("status", ex.getHttpStatus().value());
+        body.put("status", HttpStatus.NOT_FOUND.value());
         body.put("error", ex.getErrorMessage());
         body.put("path", ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);

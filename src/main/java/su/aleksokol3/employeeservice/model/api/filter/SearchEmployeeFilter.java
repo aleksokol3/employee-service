@@ -16,25 +16,25 @@ import java.time.LocalDate;
 @HiringDate
 public record SearchEmployeeFilter(
 
-        @Size(min = 1, max = 256)
+        @Size(min = 1, max = 256, message = "{firstname.size}")
         String firstName,
 
-        @Size(min = 1, max = 256)
+        @Size(min = 1, max = 256, message = "{patronymic.size}")
         String patronymic,
 
-        @Size(min = 1, max = 256)
+        @Size(min = 1, max = 256, message = "{lastname.size}")
         String lastName,
 
-        @Min(1)
+        @Min(value = 1, message = "{age.min}")
         Integer ageFrom,
 
-        @Min(1)
+        @Min(value = 1, message = "{age.min}")
         Integer ageTo,
 
-        @Min(0)
+        @Min(value = 0, message = "{salary.min}")
         BigDecimal salaryFrom,
 
-        @Min(0)
+        @Min(value = 0, message = "{salary.min}")
         BigDecimal salaryTo,
 
         LocalDate hiringDateFrom,

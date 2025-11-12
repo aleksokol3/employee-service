@@ -2,14 +2,19 @@ package su.aleksokol3.employeeservice.service.implementaion;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import su.aleksokol3.employeeservice.model.api.dto.PageList;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
-import su.aleksokol3.employeeservice.model.api.exception.NotFoundException;
+import su.aleksokol3.employeeservice.exception.NotFoundException;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
 import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.api.mapper.EmployeeMapper;
@@ -23,62 +28,108 @@ import java.time.ZoneOffset;
 import java.util.*;
 
 @RequiredArgsConstructor
+@Slf4j
+@Transactional(readOnly = true)
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
-    private static final EmployeeMapper employeeMapper = EmployeeMapper.INSTANCE;
+    private final EmployeeMapper employeeMapper;
+
     @Override
     public PageList<ReadEmployeeDto> findBy(SearchEmployeeFilter filter, Pageable pageable) {
-        List<Employee> byFilter = employeeRepository.findByFilter(filter, pageable);
-        PageList<ReadEmployeeDto> pageList = new PageList<>(new ArrayList<>(), 0, Instant.now());
-        byFilter.forEach(
-                employee -> {
-                    ReadEmployeeDto readEmployeeDto = employeeMapper.entityToReadDto(employee);
-                    pageList.getReadDtoList().add(readEmployeeDto);
-                    pageList.setTotal(pageList.getTotal() + 1);
-                }
-        );
-        return pageList;
+        log.info("Finding employees by filter: {}", filter);
+        Specification<Employee> spec = buildSpecSearch(filter);
+        Pageable pageableSortIgnoreCase = sortIgnoreCase(pageable);
+        Page<Employee> employeesByFilterPage = employeeRepository.findAll(spec, pageableSortIgnoreCase);
+
+        long totalElements = employeesByFilterPage.getTotalElements();
+        List<ReadEmployeeDto> readEmployeeDtoList = employeesByFilterPage.stream()
+                .map(employeeMapper::entityToReadDto)
+                .toList();
+
+//        List<Employee> byFilter = employeeRepository.findByFilter(filter, pageable);
+//        PageList<ReadEmployeeDto> pageList = new PageList<>(new ArrayList<>(), 0, Instant.now());
+//        byFilter.forEach(
+//                employee -> {
+//                    ReadEmployeeDto readEmployeeDto = employeeMapper.entityToReadDto(employee);
+//                    pageList.getReadDtoList().add(readEmployeeDto);
+//                    pageList.setTotal(pageList.getTotal() + 1);
+//                }
+//        );
+        return new PageList<>(readEmployeeDtoList, totalElements, Instant.now());
     }
 
     @Override
     public ReadEmployeeDto findById(UUID id) {
+        log.info("Finding employee by id: {}", id);
         return employeeRepository.findById(id)
-                .map(employeeMapper::entityToReadDto).orElseThrow(() -> new NotFoundException(HttpStatus.NOT_FOUND, "Пользователь с id %s не найден".formatted(id)));
+                .map(employeeMapper::entityToReadDto).orElseThrow(() -> new NotFoundException("Пользователь с id %s не найден".formatted(id)));
     }
 
+    @Transactional
     @Override
     public UUID create(@Valid CreateEmployeeDto dto) {
+        log.info("Creating new employee: {}", dto);
         Employee employee = employeeMapper.createDtoToEntity(dto);
         employee.setHiringDate(LocalDate.from(Instant.now().atZone(ZoneOffset.UTC)));
         Employee savedEmployee = employeeRepository.save(employee);
         return savedEmployee.getId();
     }
 
+    @Transactional
     @Override
     public void update(UUID id, @Valid PatchEmployeeDto dto) {
+        log.info("Updating employee: {}", dto);
         employeeRepository.findById(id).ifPresent(
                 employee -> {
-                    dto.firstName().ifPresent(employee::setFirstName);
-                    dto.lastName().ifPresent(employee::setLastName);
-                    dto.patronymic().ifPresent(employee::setPatronymic);
-                    dto.age().ifPresent(employee::setAge);
-                    dto.salary().ifPresent(employee::setSalary);
-                    dto.hiringDate().ifPresent(employee::setHiringDate);
-
+                    employeeMapper.updateEntity(dto, employee);
                     employeeRepository.save(employee);
                 }
         );
     }
 
+    @Transactional
     @Override
     public void deleteById(UUID id) {
+        log.info("Deleting employee by id: {}", id);
         employeeRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public void deleteBy(DeleteEmployeeFilter filter) {
-        employeeRepository.deleteByFilter(filter);
+        log.info("Deleting employee by filter: {}", filter);
+        Specification<Employee> spec = buildSpecDelete(filter);
+        employeeRepository.delete(spec);
+    }
+
+    private Specification<Employee> buildSpecSearch(SearchEmployeeFilter filter) {
+        return SpecBuilder.buildSpec(filter);
+//        return (root, query, cb) -> cb.and(
+//                filter.firstName() == null ? cb.conjunction() : cb.like(root.get("firstName"), filter.firstName()),
+//                filter.patronymic() == null ? cb.conjunction() : cb.like(root.get("patronymic"), filter.patronymic()),
+//                filter.lastName() == null ? cb.conjunction() : cb.like(root.get("lastName"), filter.lastName()),
+//                filter.ageFrom() == null ? cb.conjunction() : cb.between(root.get("age"), filter.ageFrom(), filter.ageTo()),
+//                filter.salaryFrom() == null ? cb.conjunction() : cb.between(root.get("salary"), filter.salaryFrom(), filter.salaryTo()),
+//                filter.hiringDateFrom() == null ? cb.conjunction() : cb.between(root.get("hiringDate"), filter.hiringDateFrom(), filter.hiringDateTo())
+//        );
+    }
+    private Specification<Employee> buildSpecDelete(DeleteEmployeeFilter filter) {
+        return SpecBuilder.buildSpec(filter);
+//        return (root, query, cb) -> cb.and(
+//                filter.firstName() == null ? cb.conjunction() : cb.like(root.get("firstName"), filter.firstName()),
+//                filter.patronymic() == null ? cb.conjunction() : cb.like(root.get("patronymic"), filter.patronymic()),
+//                filter.lastName() == null ? cb.conjunction() : cb.like(root.get("lastName"), filter.lastName()),
+//                filter.ageFrom() == null ? cb.conjunction() : cb.between(root.get("age"), filter.ageFrom(), filter.ageTo()),
+//                filter.hiringDateFrom() == null ? cb.conjunction() : cb.between(root.get("hiringDate"), filter.hiringDateFrom(), filter.hiringDateTo())
+//        );
+    }
+
+    private Pageable sortIgnoreCase(Pageable pageable) {
+        List<Sort.Order> ordersIgnoreCase = pageable.getSort().stream()
+                .map(Sort.Order::ignoreCase)
+                .toList();
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(ordersIgnoreCase));
     }
 }

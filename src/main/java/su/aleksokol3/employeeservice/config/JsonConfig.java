@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class JsonConfig {
-//    @Bean
-//    JsonNullableModule jsonNullableModule() {
-//        return new JsonNullableModule();
-//    }
+
     @Bean
     Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder() {
         Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();

@@ -5,13 +5,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.CollectionUtils;
+import org.springframework.data.jpa.domain.Specification;
 import su.aleksokol3.employeeservice.UnitTestBase;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
 import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.entity.Employee;
+import su.aleksokol3.employeeservice.service.implementaion.SpecBuilder;
 import su.aleksokol3.employeeservice.util.DataUtils;
 
 import java.util.List;
@@ -77,12 +79,12 @@ public class EmployeeRepositoryTest extends UnitTestBase {
         SearchEmployeeFilter filter = SearchEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
+        Specification<Employee> spec = SpecBuilder.buildSpec(filter);
         Pageable pageable = PageRequest.of(0, 5);
         // when
-        List<Employee> byFilter = employeeRepository.findByFilter(filter, pageable);
+        Page<Employee> byFilter = employeeRepository.findAll(spec, pageable);
         // then
-        assertThat(CollectionUtils.isEmpty(byFilter)).isFalse();
-        assertThat(byFilter.size()).isEqualTo(2);
+        assertThat(byFilter.getTotalElements()).isEqualTo(2);
     }
 
     @Test
@@ -140,13 +142,15 @@ public class EmployeeRepositoryTest extends UnitTestBase {
         DeleteEmployeeFilter filter = DeleteEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
+        Specification<Employee> spec = SpecBuilder.buildSpec(filter);
         // when
-        employeeRepository.deleteByFilter(filter);
+        employeeRepository.delete(spec);
         SearchEmployeeFilter findAllFilter = SearchEmployeeFilter.builder().build();
-        List<Employee> byFilter = employeeRepository.findByFilter(findAllFilter, PageRequest.of(0, 10));
+        Specification<Employee> specAll = SpecBuilder.buildSpec(findAllFilter);
+        Page<Employee> byFilter = employeeRepository.findAll(specAll, PageRequest.of(0, 10));
         // then
         assertThat(byFilter).isNotNull();
-        assertThat(byFilter.size()).isEqualTo(2);
+        assertThat(byFilter.getTotalElements()).isEqualTo(2);
     }
 
 }

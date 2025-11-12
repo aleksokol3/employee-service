@@ -23,9 +23,6 @@ public class FilterEmployeeRepositoryImpl implements FilterEmployeeRepository {
         Root<Employee> employee = criteria.from(Employee.class);
         List<Predicate> predicates = createPredicatesSearch(filter, cb, employee);
         criteria.select(employee);
-//        if (!predicates.isEmpty()) {
-//            criteria.where(predicates.toArray(Predicate[]::new));
-//        }
         criteria.where(predicates.toArray(Predicate[]::new));
         int offset = pageable.getPageNumber() * pageable.getPageSize();
         int limit = pageable.getPageSize();

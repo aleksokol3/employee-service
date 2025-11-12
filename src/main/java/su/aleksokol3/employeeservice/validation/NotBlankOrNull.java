@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NotBlankOrNull {
-    String message() default "notBlankOrNull";
+    String message() default "{not.blank.or.null}";
 
     Class<?>[] groups() default { };
 

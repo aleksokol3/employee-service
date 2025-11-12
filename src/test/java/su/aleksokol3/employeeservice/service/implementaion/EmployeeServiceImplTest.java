@@ -3,17 +3,18 @@ package su.aleksokol3.employeeservice.service.implementaion;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.jackson.nullable.JsonNullable;
+import org.springframework.data.jpa.domain.Specification;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
-import su.aleksokol3.employeeservice.model.api.exception.NotFoundException;
+import su.aleksokol3.employeeservice.exception.NotFoundException;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
-import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.repository.EmployeeRepository;
 import su.aleksokol3.employeeservice.util.DataUtils;
@@ -173,10 +174,11 @@ class EmployeeServiceImplTest {
     void givenFilter_whenDeleteByFilter_thenDeleteMethodCalls() {
         // given
         DeleteEmployeeFilter filter = DeleteEmployeeFilter.builder().build();
-        Mockito.doNothing().when(employeeRepository).deleteByFilter(filter);
+        Mockito.doReturn(0L).when(employeeRepository).delete(ArgumentMatchers.<Specification<Employee>>any());
+//        Mockito.doNothing().when(employeeRepository).deleteByFilter(filter);
         // when
         serviceUnderTest.deleteBy(filter);
         // then
-        verify(employeeRepository, times(1)).deleteByFilter(any(DeleteEmployeeFilter.class));
+        verify(employeeRepository, times(1)).delete(ArgumentMatchers.<Specification<Employee>>any());
     }
 }

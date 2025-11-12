@@ -18,9 +18,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
-import su.aleksokol3.employeeservice.model.api.exception.NotFoundException;
+import su.aleksokol3.employeeservice.exception.NotFoundException;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
-import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.service.EmployeeService;
 import su.aleksokol3.employeeservice.util.DataUtils;
@@ -75,7 +74,7 @@ class EmployeeControllerTest {
         // given
         UUID id = UUID.fromString("11e5eb40-472e-30d2-9591-036287d20258");
         Mockito.when(employeeService.findById(any(UUID.class)))
-                .thenThrow(new NotFoundException(HttpStatus.NOT_FOUND, "Пользователь с id %s не найден".formatted(id)));
+                .thenThrow(new NotFoundException("Пользователь с id %s не найден".formatted(id)));
         // when
         ResultActions result = mockMvc.perform(
                 get("/api/v1/employees/" + id)

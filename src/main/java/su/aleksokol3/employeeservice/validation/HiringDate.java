@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface HiringDate {
-    String message() default "hiringDate range";
+    String message() default "{hiringdate.range}";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default { };
 }
