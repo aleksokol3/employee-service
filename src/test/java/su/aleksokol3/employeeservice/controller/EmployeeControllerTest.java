@@ -74,7 +74,7 @@ class EmployeeControllerTest {
         // given
         UUID id = UUID.fromString("11e5eb40-472e-30d2-9591-036287d20258");
         Mockito.when(employeeService.findById(any(UUID.class)))
-                .thenThrow(new NotFoundException("Пользователь с id %s не найден".formatted(id)));
+                .thenThrow(new NotFoundException("Пользователь с id %s не найден".formatted(id), "Employee", id.toString()));
         // when
         ResultActions result = mockMvc.perform(
                 get("/api/v1/employees/" + id)

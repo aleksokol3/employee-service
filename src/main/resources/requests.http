@@ -1,3 +1,42 @@
+# GET by id
+GET localhost:8080/api/v1/employees/e30ceaea-c89b-4029-a044-3f64454d8e35
+
+###
 # GET by filter with default pageable / DELETE by filter
-    localhost:8080/api/v1/employees?ageFrom=40&ageTo=111&firstName=Jo
-#
+GET localhost:8080/api/v1/employees?ageFrom=40&ageTo=111&firstName=Jo&page=2&size=3
+
+###
+
+POST http://localhost:8080/api/v1/employees
+
+Content-Type: application/json
+{
+  "firstName": "John",
+  "lastName": "Johnson",
+  "age": 50,
+  "salary": 123.45,
+  "hiringDate": "2009-11-30"
+};
+
+###
+
+PATCH http://localhost:8080/api/v1/employees/e30ceaea-c89b-4029-a044-3f64454d8e35
+
+Content-Type: application/json
+{
+  "firstName": "John",
+  "lastName": "Johnson",
+  "age": 50,
+  "salary": 123.45,
+  "hiringDate": "2009-11-30"
+};
+
+###
+
+DELETE http://localhost:8080/api/v1/employees/e30ceaea-c89b-4029-a044-3f64454d8e35
+
+###
+
+DELETE http://localhost:8080/api/v1/employees?ageFrom=40&ageTo=111&firstName=Jo
+
+###

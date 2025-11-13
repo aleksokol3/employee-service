@@ -14,5 +14,5 @@ public interface EmployeeMapper {
 
     Employee createDtoToEntity(CreateEmployeeDto dto);
 
-    void updateEntity(PatchEmployeeDto dto, @MappingTarget Employee entity);
+    Employee updateEntity(PatchEmployeeDto dto, @MappingTarget Employee entity);
 }

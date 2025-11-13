@@ -1,6 +1,5 @@
 package su.aleksokol3.employeeservice.service.implementaion;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -10,7 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import su.aleksokol3.employeeservice.model.api.dto.PageList;
+import su.aleksokol3.employeeservice.model.api.dto.PageDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
@@ -37,7 +36,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeMapper employeeMapper;
 
     @Override
-    public PageList<ReadEmployeeDto> findBy(SearchEmployeeFilter filter, Pageable pageable) {
+    public PageDto<ReadEmployeeDto> findBy(SearchEmployeeFilter filter, Pageable pageable) {
         log.info("Finding employees by filter: {}", filter);
         Specification<Employee> spec = buildSpecSearch(filter);
         Pageable pageableSortIgnoreCase = sortIgnoreCase(pageable);
@@ -47,29 +46,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<ReadEmployeeDto> readEmployeeDtoList = employeesByFilterPage.stream()
                 .map(employeeMapper::entityToReadDto)
                 .toList();
-
-//        List<Employee> byFilter = employeeRepository.findByFilter(filter, pageable);
-//        PageList<ReadEmployeeDto> pageList = new PageList<>(new ArrayList<>(), 0, Instant.now());
-//        byFilter.forEach(
-//                employee -> {
-//                    ReadEmployeeDto readEmployeeDto = employeeMapper.entityToReadDto(employee);
-//                    pageList.getReadDtoList().add(readEmployeeDto);
-//                    pageList.setTotal(pageList.getTotal() + 1);
-//                }
-//        );
-        return new PageList<>(readEmployeeDtoList, totalElements, Instant.now());
+        return new PageDto<>(readEmployeeDtoList, totalElements, Instant.now());
     }
 
     @Override
     public ReadEmployeeDto findById(UUID id) {
         log.info("Finding employee by id: {}", id);
         return employeeRepository.findById(id)
-                .map(employeeMapper::entityToReadDto).orElseThrow(() -> new NotFoundException("Пользователь с id %s не найден".formatted(id)));
+                .map(employeeMapper::entityToReadDto)
+                .orElseThrow(() -> new NotFoundException("employee.not.found.exception", "employee", id.toString()));
     }
 
     @Transactional
     @Override
-    public UUID create(@Valid CreateEmployeeDto dto) {
+    public UUID create(CreateEmployeeDto dto) {
         log.info("Creating new employee: {}", dto);
         Employee employee = employeeMapper.createDtoToEntity(dto);
         employee.setHiringDate(LocalDate.from(Instant.now().atZone(ZoneOffset.UTC)));
@@ -79,14 +69,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional
     @Override
-    public void update(UUID id, @Valid PatchEmployeeDto dto) {
+    public ReadEmployeeDto update(UUID id, PatchEmployeeDto dto) {
         log.info("Updating employee: {}", dto);
-        employeeRepository.findById(id).ifPresent(
-                employee -> {
-                    employeeMapper.updateEntity(dto, employee);
-                    employeeRepository.save(employee);
-                }
-        );
+        return employeeRepository.findById(id)
+                        .map(employee -> employeeMapper.updateEntity(dto, employee))
+                        .map(employeeRepository::saveAndFlush)
+                        .map(employeeMapper::entityToReadDto)
+                        .orElseThrow(() -> new NotFoundException("employee.not.found.exception", "employee", id.toString()));
+//        employeeRepository.findById(id).ifPresent(
+//                employee -> {
+//                    employeeMapper.updateEntity(dto, employee);
+//                    employeeRepository.save(employee);
+//                }
+//        );
     }
 
     @Transactional

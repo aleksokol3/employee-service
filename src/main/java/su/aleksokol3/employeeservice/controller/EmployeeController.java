@@ -8,7 +8,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import su.aleksokol3.employeeservice.model.api.dto.PageList;
+import su.aleksokol3.employeeservice.model.api.dto.PageDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
@@ -27,7 +27,7 @@ class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public ResponseEntity<PageList<ReadEmployeeDto>> findBy(@Valid SearchEmployeeFilter filter, @NotNull @PageableDefault Pageable pageable) {
+    public ResponseEntity<PageDto<ReadEmployeeDto>> findBy(@Valid SearchEmployeeFilter filter, @NotNull @PageableDefault Pageable pageable) {
         return ResponseEntity.ok(employeeService.findBy(filter, pageable));
     }
 
@@ -45,9 +45,8 @@ class EmployeeController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable("id") UUID id, @RequestBody @Valid PatchEmployeeDto dto) {
-        employeeService.update(id, dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ReadEmployeeDto> update(@PathVariable("id") UUID id, @RequestBody @Valid PatchEmployeeDto dto) {
+        return ResponseEntity.ok(employeeService.update(id, dto));
     }
 
     @DeleteMapping

@@ -36,7 +36,7 @@ public class RangeValidator<T extends Annotation> implements ConstraintValidator
                         return true;
                     }
                     if (from == null || to == null) {
-                        return false;
+                        return true;
                     }
                     return from.compareTo(to) <= 0;
                 }

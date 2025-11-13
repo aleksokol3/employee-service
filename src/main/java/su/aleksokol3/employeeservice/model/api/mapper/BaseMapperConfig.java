@@ -4,8 +4,8 @@ import org.mapstruct.*;
 
 @MapperConfig(
         componentModel = MappingConstants.ComponentModel.SPRING,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-//        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR
 //        nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
 //        nullValueMapMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,
 //        nullValueMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT,

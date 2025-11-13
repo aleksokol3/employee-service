@@ -10,8 +10,8 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-public class PageList<T> {
-    List<T> readDtoList;
+public class PageDto<T> {
+    List<T> employees;
     long total;
     Instant timestamp;
 }

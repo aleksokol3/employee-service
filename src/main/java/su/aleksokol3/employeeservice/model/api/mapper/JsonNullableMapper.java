@@ -2,10 +2,9 @@ package su.aleksokol3.employeeservice.model.api.mapper;
 
 import org.mapstruct.Condition;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingConstants;
 import org.openapitools.jackson.nullable.JsonNullable;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(config = BaseMapperConfig.class)
 public abstract class JsonNullableMapper {
 
     public <T> JsonNullable<T> wrap(T entity) {

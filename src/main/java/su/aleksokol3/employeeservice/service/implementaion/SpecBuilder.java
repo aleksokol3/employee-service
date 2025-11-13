@@ -17,13 +17,46 @@ public class SpecBuilder {
             for (Field field : fields) {
                 field.setAccessible(true);
                 Object value;
+                Predicate predicate;
+                try {
+                    value = field.get(filter);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+                if (value != null) {
+                    String fieldName = field.getName();
+                    if (fieldName.endsWith("From")) {
+                        fieldName = fieldName.substring(0, fieldName.length()-"From".length());
+                        predicate = cb.greaterThanOrEqualTo(root.get(fieldName), (Comparable) value);
+                    } else if (fieldName.endsWith("To")) {
+                        fieldName = fieldName.substring(0, fieldName.length()-"To".length());
+                        predicate = cb.lessThanOrEqualTo(root.get(fieldName), (Comparable) value);
+                    } else if (field.getType() == String.class) {
+                        predicate = cb.like(root.get(fieldName), "%" + value + "%");
+                    } else {
+                        predicate = cb.equal(root.get(fieldName), value);
+                    }
+                    predicates.add(predicate);
+                }
+            }
+            return cb.and(predicates.toArray(Predicate[]::new));
+        };
+    }
+
+    private static <T> Specification<Employee> buildSpecOld(T filter) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            Field[] fields = filter.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                Object value;
+                Predicate predicate;
                 try {
                     value = field.get(filter);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
                 String fieldName = field.getName();
-                Predicate predicate;
                 if (fieldName.endsWith("From")) {
                     String columnName = fieldName.substring(0, fieldName.length()-4);
                     Object value2;
