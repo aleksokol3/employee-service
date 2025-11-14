@@ -1,17 +1,18 @@
-# GET by id
+# Get employee by id
 GET localhost:8080/api/v1/employees/e30ceaea-c89b-4029-a044-3f64454d8e35
 
 ###
-# GET by filter with default pageable / DELETE by filter
-GET localhost:8080/api/v1/employees?ageFrom=40&ageTo=111&firstName=Jo&page=2&size=3
+# Get employees by filter with pageable (page, size, sort by entity field) (query params)
+GET localhost:8080/api/v1/employees?ageFrom=40&ageTo=111&firstName=Jo&page=2&size=3&sort=salary
 
 ###
-
+# Create employee (with CreateEmployeeDto)
 POST http://localhost:8080/api/v1/employees
 
 Content-Type: application/json
 {
   "firstName": "John",
+  "patronymic": "W",
   "lastName": "Johnson",
   "age": 50,
   "salary": 123.45,
@@ -19,24 +20,22 @@ Content-Type: application/json
 };
 
 ###
-
+# Update employee (with PatchEmployeeDto)
 PATCH http://localhost:8080/api/v1/employees/e30ceaea-c89b-4029-a044-3f64454d8e35
 
 Content-Type: application/json
 {
-  "firstName": "John",
-  "lastName": "Johnson",
-  "age": 50,
-  "salary": 123.45,
-  "hiringDate": "2009-11-30"
+  "patronymic": null,
+  "age": 51,
+  "salary": 223.45
 };
 
 ###
-
+# Delete employee by id
 DELETE http://localhost:8080/api/v1/employees/e30ceaea-c89b-4029-a044-3f64454d8e35
 
 ###
-
+# Delete employee by filter (query params)
 DELETE http://localhost:8080/api/v1/employees?ageFrom=40&ageTo=111&firstName=Jo
 
 ###

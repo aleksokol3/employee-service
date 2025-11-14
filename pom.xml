@@ -10,7 +10,7 @@
     </parent>
     <groupId>su.aleksokol3</groupId>
     <artifactId>employee-service</artifactId>
-    <version>0.10.0</version>
+    <version>0.11.0</version>
     <name>employee-service</name>
     <description>employee-service</description>
     <url/>
@@ -31,6 +31,7 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <mapstruct-lombok.version>0.2.0</mapstruct-lombok.version>
         <json-nullable.version>0.2.8</json-nullable.version>
+        <springdoc-openapi.version>2.8.14</springdoc-openapi.version>
         <testcontainers-postgres.version>1.21.3</testcontainers-postgres.version>
     </properties>
     <dependencies>
@@ -75,6 +76,11 @@
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
             <version>${json-nullable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc-openapi.version}</version>
         </dependency>
 
         <dependency>

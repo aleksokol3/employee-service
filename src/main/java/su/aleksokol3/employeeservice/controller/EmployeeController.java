@@ -3,6 +3,7 @@ package su.aleksokol3.employeeservice.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,9 @@ class EmployeeController {
     private final EmployeeService employeeService;
 
     @GetMapping
-    public ResponseEntity<PageDto<ReadEmployeeDto>> findBy(@Valid SearchEmployeeFilter filter, @NotNull @PageableDefault Pageable pageable) {
+    public ResponseEntity<PageDto<ReadEmployeeDto>> findBy(
+            @Valid SearchEmployeeFilter filter,
+            @NotNull @PageableDefault(page = 0, size = 10) @ParameterObject Pageable pageable) {
         return ResponseEntity.ok(employeeService.findBy(filter, pageable));
     }
 

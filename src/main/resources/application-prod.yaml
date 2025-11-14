@@ -21,3 +21,8 @@ spring:
           batch_size: 100
         order_inserts: true
         order_updates: true
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
