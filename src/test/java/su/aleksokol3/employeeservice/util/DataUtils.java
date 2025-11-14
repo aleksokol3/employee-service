@@ -50,9 +50,20 @@ public class DataUtils {
                 .hiringDate(LocalDate.of(2020, 10, 15))
                 .build();
     }
+    public static ReadEmployeeDto getJuanRodriguezReadDto() {
+        return ReadEmployeeDto.builder()
+                .id(UUID.fromString("10e5eb40-472e-40d2-9591-036287d20258"))
+                .firstName("Juan")
+                .patronymic("V")
+                .lastName("Rodriguez")
+                .age(40)
+                .salary(BigDecimal.valueOf(222.22))
+                .hiringDate(LocalDate.of(2020, 10, 15))
+                .build();
+    }
     public static PatchEmployeeDto getJuanRodriguezPatchDto() {
         return PatchEmployeeDto.builder()
-//                .firstName(JsonNullable.of("Juanito"))
+                .firstName(JsonNullable.undefined())
                 .patronymic(JsonNullable.undefined())
                 .lastName(JsonNullable.undefined())
                 .age(JsonNullable.undefined())
@@ -60,14 +71,23 @@ public class DataUtils {
                 .hiringDate(JsonNullable.undefined())
                 .build();
     }
-    public static ReadEmployeeDto getJuanRodriguezReadDto() {
-        return ReadEmployeeDto.builder()
-                .id(UUID.fromString("10e5eb40-472e-30d2-9591-036287d20258"))
+    public static Employee getJuanRodriguezUpdatedPersisted() {
+        return Employee.builder()
+                .id(UUID.fromString("10e5eb40-472e-40d2-9591-036287d20258"))
                 .firstName("Juan")
-                .patronymic("V")
                 .lastName("Rodriguez")
                 .age(40)
-                .salary(BigDecimal.valueOf(222.22))
+                .salary(BigDecimal.valueOf(777.77))
+                .hiringDate(LocalDate.of(2020, 10, 15))
+                .build();
+    }
+    public static ReadEmployeeDto getJuanRodriguezUpdatedReadDto() {
+        return ReadEmployeeDto.builder()
+                .id(UUID.fromString("10e5eb40-472e-40d2-9591-036287d20258"))
+                .firstName("Juan")
+                .lastName("Rodriguez")
+                .age(40)
+                .salary(BigDecimal.valueOf(777.77))
                 .hiringDate(LocalDate.of(2020, 10, 15))
                 .build();
     }
@@ -119,5 +139,24 @@ public class DataUtils {
                 .hiringDate(LocalDate.of(2017, 2, 20))
                 .build();
     }
+    public static Employee getGabrielMarquezTransient() {
+        return Employee.builder()
+                .firstName("Gabriel")
+                .lastName("Marquez")
+                .age(70)
+                .salary(BigDecimal.valueOf(2487.25))
+                .hiringDate(LocalDate.of(1967, 2, 20))
+                .build();
+    }
 
+    public static Employee getGabrielMarquezPersisted() {
+        return Employee.builder()
+                .id(UUID.randomUUID())
+                .firstName("Gabriel")
+                .lastName("Marquez")
+                .age(70)
+                .salary(BigDecimal.valueOf(2487.25))
+                .hiringDate(LocalDate.of(1967, 2, 20))
+                .build();
+    }
 }

@@ -10,7 +10,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 @DataJpaTest            // использ. для тестирования репозиторного слоя: загружает @Entity, @Repository и JPARepository; НЕ подгружает в контекст компоненты @Component, @Service, @Controller / @RestController, @Bean
 @ActiveProfiles("test")
-@Sql({"classpath:sql/data.sql"})
+//@Sql({"classpath:sql/data.sql"})
 public abstract class UnitTestBase {
     private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:17");
     @BeforeAll

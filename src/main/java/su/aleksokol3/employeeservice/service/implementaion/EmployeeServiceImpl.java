@@ -39,7 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public PageDto<ReadEmployeeDto> findBy(SearchEmployeeFilter filter, Pageable pageable) {
         log.info("Finding employees by filter: {}", filter);
         Specification<Employee> spec = buildSpecSearch(filter);
-        Pageable pageableSortIgnoreCase = sortIgnoreCase(pageable);
+        Pageable pageableSortIgnoreCase = preparePageable(pageable);
         Page<Employee> employeesByFilterPage = employeeRepository.findAll(spec, pageableSortIgnoreCase);
 
         long totalElements = employeesByFilterPage.getTotalElements();
@@ -54,7 +54,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         log.info("Finding employee by id: {}", id);
         return employeeRepository.findById(id)
                 .map(employeeMapper::entityToReadDto)
-                .orElseThrow(() -> new NotFoundException("employee.not.found.exception", "employee", id.toString()));
+                .orElseThrow(() -> new NotFoundException("not.found.exception", "employee", id.toString()));
     }
 
     @Transactional
@@ -62,7 +62,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     public UUID create(CreateEmployeeDto dto) {
         log.info("Creating new employee: {}", dto);
         Employee employee = employeeMapper.createDtoToEntity(dto);
-        employee.setHiringDate(LocalDate.from(Instant.now().atZone(ZoneOffset.UTC)));
         Employee savedEmployee = employeeRepository.save(employee);
         return savedEmployee.getId();
     }
@@ -75,7 +74,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         .map(employee -> employeeMapper.updateEntity(dto, employee))
                         .map(employeeRepository::saveAndFlush)
                         .map(employeeMapper::entityToReadDto)
-                        .orElseThrow(() -> new NotFoundException("employee.not.found.exception", "employee", id.toString()));
+                        .orElseThrow(() -> new NotFoundException("not.found.exception", "employee", id.toString()));
 //        employeeRepository.findById(id).ifPresent(
 //                employee -> {
 //                    employeeMapper.updateEntity(dto, employee);
@@ -121,6 +120,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        );
     }
 
+    private Pageable preparePageable(Pageable pageable) {
+        if (pageable.getPageSize() > 100) {
+            return sortIgnoreCase(PageRequest.of(pageable.getPageNumber(), 100, pageable.getSort()));
+        }
+        return sortIgnoreCase(pageable);
+    }
     private Pageable sortIgnoreCase(Pageable pageable) {
         List<Sort.Order> ordersIgnoreCase = pageable.getSort().stream()
                 .map(Sort.Order::ignoreCase)

@@ -10,20 +10,28 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import su.aleksokol3.employeeservice.model.api.dto.PageDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
 import su.aleksokol3.employeeservice.exception.NotFoundException;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
+import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.service.EmployeeService;
 import su.aleksokol3.employeeservice.util.DataUtils;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,12 +40,13 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest     // загружает только указанные контроллеры, вместо всего контекста
+@WebMvcTest(EmployeeController.class)     // загружает только указанные контроллеры, вместо всего контекста
 @RequiredArgsConstructor
 class EmployeeControllerTest {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
+    private final MessageSource messageSource;
     @MockitoBean
     private EmployeeService employeeService;
 
@@ -63,48 +72,53 @@ class EmployeeControllerTest {
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", CoreMatchers.is(dto.id().toString())))
                 .andExpect(jsonPath("$.firstName", CoreMatchers.is(dto.firstName())))
-//                .andExpect(jsonPath("$.patronymic", CoreMatchers.is(dto.patronymic())))
-                .andExpect(jsonPath("$.lastName", CoreMatchers.is(dto.lastName())));
-//                .andExpect(jsonPath("$.salary", CoreMatchers.is(dto.salary())))
-//                .andExpect(jsonPath("$.hiringDate", CoreMatchers.is(dto.hiringDate())));
+                .andExpect(jsonPath("$.patronymic", CoreMatchers.is(dto.patronymic())))
+                .andExpect(jsonPath("$.lastName", CoreMatchers.is(dto.lastName())))
+                .andExpect(jsonPath("$.salary").value(dto.salary()))
+                .andExpect(jsonPath("$.hiringDate", CoreMatchers.is(dto.hiringDate().toString())));
     }
 
     @Test
+    @DisplayName("Test find by incorrect id functionality")
     void givenIncorrectId_whenFindById_thenExceptionIsThrown() throws Exception {
         // given
         UUID id = UUID.fromString("11e5eb40-472e-30d2-9591-036287d20258");
+        String employeeLocalizedName = messageSource.getMessage("employee", new Object[0], Locale.getDefault());
+        String errorLocalizedMessage = messageSource.getMessage("not.found.exception", new Object[]{employeeLocalizedName, id.toString()}, Locale.getDefault());
         Mockito.when(employeeService.findById(any(UUID.class)))
-                .thenThrow(new NotFoundException("Пользователь с id %s не найден".formatted(id), "Employee", id.toString()));
+                .thenThrow(new NotFoundException("not.found.exception", "employee", id.toString()));
         // when
         ResultActions result = mockMvc.perform(
                 get("/api/v1/employees/" + id)
-                        .contentType(MediaType.APPLICATION_JSON));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .locale(Locale.getDefault()));
         // then
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", CoreMatchers.is(HttpStatus.NOT_FOUND.value())))
-                .andExpect(jsonPath("$.path", CoreMatchers.is("http://localhost/api/v1/employees/" + id)))
-                .andExpect(jsonPath("$.error", CoreMatchers.is("Пользователь с id %s не найден".formatted(id))));
+                .andExpect(jsonPath("$.error", CoreMatchers.is(errorLocalizedMessage)));
     }
 
-//    @Test             // NEED TO REFACTOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//    @DisplayName("Test find by filter functionality")
-//    void givenFilter_whenFindByFilter_thenEmployeesAreReturned() throws Exception {
-//        // given
-//        EmployeeFilter filter = EmployeeFilter.builder().lastName("Rodriguez").build();
-//        List<ReadEmployeeDto> dtos = List.of(DataUtils.getJuanRodriguezReadDto());
-//        Mockito.when(employeeService.findBy(any(EmployeeFilter.class), any(Pageable.class)))
-//                .thenReturn(dtos);
-//        // when
-//        ResultActions result = mockMvc.perform(
-//                get("/api/v1/employees")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                                .content(objectMapper.writeValueAsString(filter)));
-//        // then
-//        result.andExpect(status().isOk())
-//                .andExpect(jsonPath("$[0].firstName", CoreMatchers.is("Juan")))
-//                .andExpect(jsonPath("$[0].lastName", CoreMatchers.is("Rodriguez")));
-//        verify(employeeService, times(1)).findBy(any(EmployeeFilter.class), any(Pageable.class));
-//    }
+    @Test
+    @DisplayName("Test find by filter functionality")
+    void givenFilter_whenFindByFilter_thenEmployeesAreReturned() throws Exception {
+        // given
+        SearchEmployeeFilter filter = SearchEmployeeFilter.builder().lastName("Rodriguez").build();
+        List<ReadEmployeeDto> dtos = List.of(DataUtils.getJuanRodriguezReadDto());
+        PageDto<ReadEmployeeDto> pageDto = new PageDto<>(dtos, 1, Instant.now());
+        Mockito.when(employeeService.findBy(any(SearchEmployeeFilter.class), any(Pageable.class)))
+                .thenReturn(pageDto);
+        // when
+        ResultActions result = mockMvc.perform(
+                get("/api/v1/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(filter)));
+        // then
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.employees[0].firstName", CoreMatchers.is("Juan")))
+                .andExpect(jsonPath("$.employees[0].lastName", CoreMatchers.is("Rodriguez")))
+                .andExpect(jsonPath("$.total", CoreMatchers.is(1)));
+        verify(employeeService, times(1)).findBy(any(SearchEmployeeFilter.class), any(Pageable.class));
+    }
 
     @Test
     @DisplayName("Test create functionality")
@@ -128,37 +142,39 @@ class EmployeeControllerTest {
     @DisplayName("Test create with invalid dto functionality")
     void givenInvalidCreateEmployeeDto_whenCreateEmployee_thenErrorResponse() throws Exception {
         // given
-        CreateEmployeeDto dto = DataUtils.getJuanRodriguezInvalidCreateDto();
+        CreateEmployeeDto invalidCreateDto = DataUtils.getJuanRodriguezInvalidCreateDto();
         Mockito.when(employeeService.create(any(CreateEmployeeDto.class)))
                 .thenReturn(null);
         // when
         ResultActions result = mockMvc.perform(
                 post("/api/v1/employees")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)));
+                        .content(objectMapper.writeValueAsString(invalidCreateDto)));
         // then
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status", CoreMatchers.is(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(jsonPath("$.path", CoreMatchers.is("http://localhost/api/v1/employees")))    // where is a PORT???
                 .andExpect(jsonPath("$.errors", CoreMatchers.notNullValue()));
-//                .andExpect(jsonPath("$.errors", CoreMatchers.hasItem("AGE: must be greater than or equal to 1")))
-//                .andExpect(jsonPath("$.errors[0]", CoreMatchers.containsString("AGE")));
     }
 
     @Test
     @DisplayName("Test update functionality")
     void givenPatchDto_whenUpdate_thenSuccessResponse() throws Exception {
         // given
-        PatchEmployeeDto dto = DataUtils.getJuanRodriguezPatchDto();
+        PatchEmployeeDto patchDto = DataUtils.getJuanRodriguezPatchDto();
+        BigDecimal salary = BigDecimal.ONE.multiply(patchDto.salary().get());
         Employee persistedEntity = DataUtils.getJuanRodriguezPersisted();
-        Mockito.doNothing().when(employeeService).update(any(UUID.class), any(PatchEmployeeDto.class));
+        ReadEmployeeDto readDto = DataUtils.getJuanRodriguezUpdatedReadDto();
+        Mockito.when(employeeService.update(any(UUID.class), any(PatchEmployeeDto.class)))
+                .thenReturn(readDto);
         // when
         ResultActions result = mockMvc.perform(
                 patch("/api/v1/employees/" + persistedEntity.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)));
+                        .content(objectMapper.writeValueAsString(patchDto)));
         // then
-        result.andExpect(status().isOk());
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.salary").value(patchDto.salary().get()));
+
         verify(employeeService, times(1)).update(any(UUID.class), any(PatchEmployeeDto.class));
     }
 

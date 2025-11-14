@@ -21,7 +21,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+//@DataJpaTest
 @RequiredArgsConstructor
 public class EmployeeRepositoryTest extends UnitTestBase {
     private final EmployeeRepository employeeRepository;
@@ -136,21 +136,23 @@ public class EmployeeRepositoryTest extends UnitTestBase {
         Employee luisHernandezTransient = DataUtils.getLuisHernandezTransient();
         Employee mariaAlonsoTransient = DataUtils.getMariaAlonsoTransient();
         Employee ivanAlonsoTransient = DataUtils.getIvanAlonsoTransient();
+        Employee gabrielMarquezTransient = DataUtils.getGabrielMarquezTransient();
 
-        employeeRepository.saveAll(List.of(juanRodriguezTransient, luisHernandezTransient, mariaAlonsoTransient, ivanAlonsoTransient));
+        employeeRepository.saveAll(List.of(juanRodriguezTransient, luisHernandezTransient, mariaAlonsoTransient, ivanAlonsoTransient, gabrielMarquezTransient));
 
         DeleteEmployeeFilter filter = DeleteEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
         Specification<Employee> spec = SpecBuilder.buildSpec(filter);
         // when
-        employeeRepository.delete(spec);
+        long deleted = employeeRepository.delete(spec);
         SearchEmployeeFilter findAllFilter = SearchEmployeeFilter.builder().build();
         Specification<Employee> specAll = SpecBuilder.buildSpec(findAllFilter);
         Page<Employee> byFilter = employeeRepository.findAll(specAll, PageRequest.of(0, 10));
         // then
+        assertThat(deleted).isEqualTo(2);
         assertThat(byFilter).isNotNull();
-        assertThat(byFilter.getTotalElements()).isEqualTo(2);
+        assertThat(byFilter.getTotalElements()).isEqualTo(3);
     }
 
 }

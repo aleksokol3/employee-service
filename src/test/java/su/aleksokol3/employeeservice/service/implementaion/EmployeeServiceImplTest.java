@@ -8,18 +8,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.openapitools.jackson.nullable.JsonNullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import su.aleksokol3.employeeservice.model.api.dto.PageDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
 import su.aleksokol3.employeeservice.exception.NotFoundException;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
+import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
+import su.aleksokol3.employeeservice.model.api.mapper.EmployeeMapper;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.repository.EmployeeRepository;
 import su.aleksokol3.employeeservice.util.DataUtils;
 
-import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +39,8 @@ import static org.mockito.Mockito.*;
 class EmployeeServiceImplTest {
     @Mock
     private EmployeeRepository employeeRepository;
+    @Mock
+    private EmployeeMapper employeeMapper;
     @InjectMocks
     private EmployeeServiceImpl serviceUnderTest;
 
@@ -39,13 +48,17 @@ class EmployeeServiceImplTest {
     @DisplayName("Test find by id functionality")
     void givenId_whenFindById_thenEmployeeIsReturned() {
         // given
-        Employee juanRodriguezPersisted = DataUtils.getJuanRodriguezPersisted();
+        Employee entity = DataUtils.getJuanRodriguezPersisted();
+        ReadEmployeeDto readDto = DataUtils.getJuanRodriguezReadDto();
+        Mockito.when(employeeMapper.entityToReadDto(any(Employee.class)))
+                        .thenReturn(readDto);
         Mockito.when(employeeRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.of(juanRodriguezPersisted));
+                .thenReturn(Optional.of(entity));
         // when
-        ReadEmployeeDto obtainedEmployee = serviceUnderTest.findById(juanRodriguezPersisted.getId());
+        ReadEmployeeDto obtainedEmployee = serviceUnderTest.findById(entity.getId());
         // then
         assertThat(obtainedEmployee).isNotNull();
+        assertThat(obtainedEmployee.id()).isEqualTo(entity.getId());
     }
 
     @Test
@@ -59,108 +72,100 @@ class EmployeeServiceImplTest {
         assertThrows(NotFoundException.class, () -> serviceUnderTest.findById(incorrectId));
     }
 
-//    @Test             // NEED TO REFACTOR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//    void givenFilter_whenFindByFilter_thenEmployeesAreReturned() {
-//        // given
-//        EmployeeFilter filter = EmployeeFilter.builder().build();
-//        Pageable pageable = PageRequest.of(0, 10);
-//        List<Employee> employees = List.of(
-//                DataUtils.getJuanRodriguezPersisted(),
-//                DataUtils.getIvanAlonsoPersisted(),
-//                DataUtils.getMariaAlonsoPersisted()
-//        );
-//        Mockito.when(employeeRepository.findByFilter(any(EmployeeFilter.class), any(Pageable.class)))
-//                .thenReturn(employees);
-//        // when
-//        List<ReadEmployeeDto> obtainedDtos = serviceUnderTest.findBy(filter, pageable);
-//        // then
-//        assertThat(obtainedDtos).isNotNull();
-//        assertThat(obtainedDtos.size()).isEqualTo(3);
-//    }
+    @Test
+    @DisplayName("Test find by filter functionality")
+    void givenFilter_whenFindByFilter_thenEmployeesAreReturned() {
+        // given
+        SearchEmployeeFilter filter = SearchEmployeeFilter.builder().build();
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Employee> employees = List.of(
+                DataUtils.getJuanRodriguezPersisted(),
+                DataUtils.getIvanAlonsoPersisted(),
+                DataUtils.getMariaAlonsoPersisted()
+        );
+        Page<Employee> employeesPage = new PageImpl<>(employees);
+        Mockito.when(employeeRepository.findAll(ArgumentMatchers.<Specification<Employee>>any(), any(Pageable.class)))
+                .thenReturn(employeesPage);
+        // when
+        PageDto<ReadEmployeeDto> pageDto = serviceUnderTest.findBy(filter, pageable);
+        // then
+        assertThat(pageDto).isNotNull();
+        assertThat(pageDto.getEmployees()).hasSize(3);
+    }
 
-//    @Test           // NEED TO REFACTOR !!!!!!!!!!!!!!!!!!!!!!!
-//    void givenFilter_whenFindByFilter_thenEmployeesAreNotFound() {
-//        // given
-//        EmployeeFilter filter = EmployeeFilter.builder().build();
-//        Pageable pageable = PageRequest.of(0, 10);
-//        List<Employee> employees = Collections.emptyList();
-//        Mockito.when(employeeRepository.findByFilter(any(EmployeeFilter.class), any(Pageable.class)))
-//                .thenReturn(employees);
-//        // when
-//        List<ReadEmployeeDto> obtainedDtos = serviceUnderTest.findBy(filter, pageable);
-//        // then
-//        assertThat(CollectionUtils.isEmpty(obtainedDtos)).isTrue();
-//    }
+    @Test
+    @DisplayName("Test find by unsuitable filter functionality")
+    void givenFilter_whenFindByFilter_thenEmployeesAreNotFound() {
+        // given
+        SearchEmployeeFilter filter = SearchEmployeeFilter.builder().build();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Employee> employeesPage = new PageImpl<>(Collections.emptyList());
+        Mockito.when(employeeRepository.findAll(ArgumentMatchers.<Specification<Employee>>any(), any(Pageable.class)))
+                .thenReturn(employeesPage);
+        // when
+        PageDto<ReadEmployeeDto> pageDto = serviceUnderTest.findBy(filter, pageable);
+        // then
+        assertThat(pageDto.getEmployees()).isEmpty();
+    }
 
     @Test
     @DisplayName("Test save employee functionality")
     void givenEmployee_whenSaveEmployee_thenRepositoryIsCalled() {
         // given
-        CreateEmployeeDto createEmployeeDto = DataUtils.getJuanRodriguezCreateDto();
-        Employee employeePersisted = DataUtils.getJuanRodriguezPersisted();
-        Mockito.when(employeeRepository.save(any(Employee.class))).thenReturn(employeePersisted);
+        CreateEmployeeDto createDto = DataUtils.getJuanRodriguezCreateDto();
+        Employee transientEntity = DataUtils.getJuanRodriguezTransient();
+        Employee persistedEntity = DataUtils.getJuanRodriguezPersisted();
+        Mockito.when(employeeMapper.createDtoToEntity(createDto))
+                        .thenReturn(transientEntity);
+        Mockito.when(employeeRepository.save(any(Employee.class))).thenReturn(persistedEntity);
         // when
-        UUID savedEmployeeId = serviceUnderTest.create(createEmployeeDto);
+        UUID savedEmployeeId = serviceUnderTest.create(createDto);
         // then
         assertThat(savedEmployeeId).isNotNull();
     }
 
-//    @Test
-//    @DisplayName("Test save employee with negative age functionality")
-//    void givenEmployeeDtoWithNegativeAge_whenSaveEmployee_thenExceptionIsThrown() {
-//        // given
-//        CreateEmployeeDto createEmployeeDto = DataUtils.getJuanRodriguezInvalidCreateDto();
-//        Mockito.when(employeeRepository.save(any(Employee.class)))
-//                .thenThrow(MethodArgumentNotValidException.class);
-//        // when - then
-//        assertThrows(MethodArgumentNotValidException.class, () -> serviceUnderTest.create(createEmployeeDto));
-//        verify(employeeRepository, never()).save(any(Employee.class));
-//    }
-
     @Test
     @DisplayName("Test update functionality")
-    void givenPatchEmployeeDto_whenUpdate_thenRepositoryIsCalled() {
+    void givenPatchEmployeeDto_whenUpdate_thenRepositoryIsCalledAndUpdatedEmployeeIsReturned() {
         // given
-        PatchEmployeeDto patchEmployeeDto = PatchEmployeeDto.builder()
-                .firstName(JsonNullable.of("Иван"))
-                .patronymic(JsonNullable.of(null))
-                .lastName(JsonNullable.of("Иванов"))
-                .age(JsonNullable.undefined())
-                .salary(JsonNullable.of(BigDecimal.valueOf(14.59)))
-                .hiringDate(JsonNullable.undefined())
-                .build();
-        Employee employeePersisted = DataUtils.getJuanRodriguezPersisted();
+        PatchEmployeeDto patchDto = DataUtils.getJuanRodriguezPatchDto();
+        Employee transientEntity = DataUtils.getJuanRodriguezTransient();
+        Employee persistedEntity = DataUtils.getJuanRodriguezPersisted();
+        Employee updatedPersistedEntity = DataUtils.getJuanRodriguezUpdatedPersisted();
+        ReadEmployeeDto updatedReadDto = DataUtils.getJuanRodriguezUpdatedReadDto();
+        Mockito.when(employeeMapper.updateEntity(any(PatchEmployeeDto.class), any(Employee.class)))
+                        .thenReturn(transientEntity);
         Mockito.when(employeeRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.of(employeePersisted));
-        Mockito.when(employeeRepository.save(any(Employee.class)))
-                .thenReturn(employeePersisted);
+                .thenReturn(Optional.of(persistedEntity));
+        Mockito.when(employeeRepository.saveAndFlush(any(Employee.class)))
+                .thenReturn(updatedPersistedEntity);
+        Mockito.when(employeeMapper.entityToReadDto(any(Employee.class)))
+                .thenReturn(updatedReadDto);
         // when
-        serviceUnderTest.update(employeePersisted.getId(), patchEmployeeDto);
-        Employee updatedEmployee = employeeRepository.findById(employeePersisted.getId()).orElse(null);
+        ReadEmployeeDto resultReadDto = serviceUnderTest.update(persistedEntity.getId(), patchDto);
 
         // then
-        assertThat(updatedEmployee).isNotNull();
-        verify(employeeRepository, times(1)).save(any(Employee.class));
+        assertThat(resultReadDto).isNotNull();
+        assertThat(resultReadDto.id()).isEqualTo(persistedEntity.getId());
+        verify(employeeRepository, times(1)).findById(any(UUID.class));
+        verify(employeeRepository, times(1)).saveAndFlush(any(Employee.class));
     }
     @Test
     @DisplayName("Test update with incorrect id functionality")
     void givenPatchEmployeeDtoWithIncorrectId_whenUpdate_thenNothingHappened() {
         // given
-        PatchEmployeeDto patchEmployeeDto = PatchEmployeeDto.builder()
-                .firstName(JsonNullable.of("Иван"))
-                .lastName(JsonNullable.of("Иванов"))
-                .build();
+        PatchEmployeeDto patchDto = DataUtils.getJuanRodriguezPatchDto();
         UUID incorrectId = UUID.randomUUID();
         Mockito.when(employeeRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.empty());
-        // when
-        serviceUnderTest.update(incorrectId, patchEmployeeDto);
-        // then
+                .thenThrow(NotFoundException.class);
+        // when - then
+        assertThrows(NotFoundException.class, () -> serviceUnderTest.update(incorrectId, patchDto));
         verify(employeeRepository, never()).save(any(Employee.class));
     }
 
     @Test
-    void givenId_whenDeleteByFilter_thenDeleteMethodCalls() {
+    @DisplayName("Test delete by id functionality")
+    void givenId_whenDeleteById_thenDeleteMethodCalls() {
         // given
         UUID id = UUID.randomUUID();
         Mockito.doNothing().when(employeeRepository).deleteById(any(UUID.class));
@@ -171,11 +176,11 @@ class EmployeeServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test delete by filter functionality")
     void givenFilter_whenDeleteByFilter_thenDeleteMethodCalls() {
         // given
         DeleteEmployeeFilter filter = DeleteEmployeeFilter.builder().build();
         Mockito.doReturn(0L).when(employeeRepository).delete(ArgumentMatchers.<Specification<Employee>>any());
-//        Mockito.doNothing().when(employeeRepository).deleteByFilter(filter);
         // when
         serviceUnderTest.deleteBy(filter);
         // then
