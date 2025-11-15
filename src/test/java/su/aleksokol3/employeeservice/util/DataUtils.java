@@ -45,7 +45,7 @@ public class DataUtils {
                 .firstName("Juan")
                 .patronymic("V")
                 .lastName("Rodriguez")
-                .age(-40)
+                .age(-40)                               // Invalid data
                 .salary(BigDecimal.valueOf(222.22))
                 .hiringDate(LocalDate.of(2020, 10, 15))
                 .build();
@@ -68,6 +68,16 @@ public class DataUtils {
                 .lastName(JsonNullable.undefined())
                 .age(JsonNullable.undefined())
                 .salary(JsonNullable.of(BigDecimal.valueOf(777.77)))
+                .hiringDate(JsonNullable.undefined())
+                .build();
+    }
+    public static PatchEmployeeDto getJuanRodriguezInvalidPatchDto() {
+        return PatchEmployeeDto.builder()
+                .firstName(JsonNullable.undefined())
+                .patronymic(JsonNullable.undefined())
+                .lastName(JsonNullable.undefined())
+                .age(JsonNullable.of(-40))              // Invalid data
+                .salary(JsonNullable.undefined())
                 .hiringDate(JsonNullable.undefined())
                 .build();
     }

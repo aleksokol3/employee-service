@@ -75,12 +75,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                         .map(employeeRepository::saveAndFlush)
                         .map(employeeMapper::entityToReadDto)
                         .orElseThrow(() -> new NotFoundException("not.found.exception", "employee", id.toString()));
-//        employeeRepository.findById(id).ifPresent(
-//                employee -> {
-//                    employeeMapper.updateEntity(dto, employee);
-//                    employeeRepository.save(employee);
-//                }
-//        );
     }
 
     @Transactional
