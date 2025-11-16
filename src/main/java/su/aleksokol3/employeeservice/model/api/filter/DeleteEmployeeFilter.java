@@ -8,6 +8,16 @@ import su.aleksokol3.employeeservice.validation.HiringDate;
 
 import java.time.LocalDate;
 
+/**
+ * Filter to delete employees
+ * @param firstName
+ * @param patronymic
+ * @param lastName
+ * @param ageFrom
+ * @param ageTo
+ * @param hiringDateFrom
+ * @param hiringDateTo
+ */
 @Builder
 @Age
 @HiringDate

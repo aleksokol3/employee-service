@@ -10,7 +10,7 @@
     </parent>
     <groupId>su.aleksokol3</groupId>
     <artifactId>employee-service</artifactId>
-    <version>0.11.2</version>
+    <version>0.11.3</version>
     <name>employee-service</name>
     <description>employee-service</description>
     <url/>

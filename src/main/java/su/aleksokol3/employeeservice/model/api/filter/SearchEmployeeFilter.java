@@ -10,6 +10,19 @@ import su.aleksokol3.employeeservice.validation.Salary;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Filter to search employees
+ *
+ * @param firstName
+ * @param patronymic
+ * @param lastName
+ * @param ageFrom
+ * @param ageTo
+ * @param salaryFrom
+ * @param salaryTo
+ * @param hiringDateFrom
+ * @param hiringDateTo
+ */
 @Builder
 @Age
 @Salary

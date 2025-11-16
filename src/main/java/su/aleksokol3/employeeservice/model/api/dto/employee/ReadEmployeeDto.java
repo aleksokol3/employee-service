@@ -6,6 +6,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Presentation of employee entity, returning from repository.
+ */
 @Builder
 public record ReadEmployeeDto(
         UUID id,

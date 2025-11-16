@@ -11,6 +11,16 @@ import su.aleksokol3.employeeservice.validation.NotBlankOrNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Presentation of employee entity to update an employee.
+ *
+ * @param firstName Should be not blank, has size between 1 and 256 characters.
+ * @param patronymic Can be null, else should be not blank, has size between 1 and 256 characters.
+ * @param lastName Should be not blank, has size between 1 and 256 characters.
+ * @param age Should be not null, has size equal or more than 1.
+ * @param salary Should be not null, has size equal or more than 0.
+ * @param hiringDate Should be not null, be the date in the past or in the present.
+ */
 @Builder
 public record PatchEmployeeDto(
 //        @NotBlank - аннотация над JsonNullable'ом - работает так же

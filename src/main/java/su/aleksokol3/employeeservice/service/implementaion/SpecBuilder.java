@@ -8,6 +8,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Build {@link Specification} of entity based on the given filter
+ */
 public class SpecBuilder {
 
     public static <T> Specification<Employee> buildSpec(T filter) {

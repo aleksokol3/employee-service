@@ -16,6 +16,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * RestControllerExceptionHandler class is descendant of {@link ResponseEntityExceptionHandler} for customizing exceptions.
+ */
 @RestControllerAdvice(basePackages = "su.aleksokol3.employeeservice.controller")
 @RequiredArgsConstructor
 public class RestControllerExceptionHandler extends ResponseEntityExceptionHandler {
@@ -51,8 +54,14 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         return ResponseEntity.of(problemDetail).build();
     }
 
+    /**
+     * Customize the handling of {@link NotFoundException}
+     * @param ex the exception to handle
+     * @param req the current request
+     * @return a {@link ResponseEntity} for the response to use
+     */
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Object> handleNotFoundException(NotFoundException ex, WebRequest req) {
+    public ResponseEntity<ProblemDetail> handleNotFoundException(NotFoundException ex, WebRequest req) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now());
         String entityNameLocalized = messageSource.getMessage(ex.getEntityName(), new Object[0], req.getLocale());

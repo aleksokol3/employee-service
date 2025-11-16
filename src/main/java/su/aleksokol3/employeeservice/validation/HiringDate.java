@@ -8,6 +8,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * The annotated element must be {@link java.time.LocalDate}.
+ */
 @Constraint(validatedBy = HiringDateValidator.class)
 @Target(value = {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

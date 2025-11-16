@@ -6,7 +6,17 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-public class RangeValidator<T extends Annotation> implements ConstraintValidator<T, Object> {
+/**
+ * Check that the validation parameter is in range between two fields: 'from' and 'to',
+ * or if one of the fields is not present:
+ * greater or equal than 'from' or less or equal than 'to'.
+ * @param <T> type of annotation class
+ */
+public abstract class RangeValidator<T extends Annotation> implements ConstraintValidator<T, Object> {
+
+    /**
+     * Class of annotation.
+     */
     private Class<T> clazz;
 
     void setClazz(Class<T> clazz) {

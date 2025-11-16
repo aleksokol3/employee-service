@@ -7,6 +7,9 @@ import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 
+/**
+ * Mapper to convert employee entity to dto and vice-versa
+ */
 @Mapper(config = BaseMapperConfig.class, uses = JsonNullableMapper.class)
 public interface EmployeeMapper {
 

@@ -2,6 +2,9 @@ package su.aleksokol3.employeeservice.model.api.mapper;
 
 import org.mapstruct.*;
 
+/**
+ * Base configs for other mappers
+ */
 @MapperConfig(
         componentModel = MappingConstants.ComponentModel.SPRING,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,

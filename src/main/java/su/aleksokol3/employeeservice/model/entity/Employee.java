@@ -8,6 +8,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Employee entity, representing a table 'employee' in the DB
+ */
 @Entity
 @Table(name = "employee", schema = "public")
 @Getter
