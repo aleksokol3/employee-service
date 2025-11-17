@@ -1,0 +1,25 @@
+name: employee-service
+services:
+  employee-app:
+    image: employeeservice-image
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/employeeservice
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17
+    hostname: postgres
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_DB: employeeservice
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
