@@ -3,7 +3,7 @@
 --changeset aleksokol3:1 dbms:postgresql
 --preconditions onFail:HALT onError:HALT
 
--- Change description: create table employee
+-- Change description: (T-002): add patronymic column, change type for hiring_date column
 -- AUTHOR: Aleksey Sokolov
 -- Date: 2025.11.04
 -- Versioning strategy: Semantic Versioning

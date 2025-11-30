@@ -4,14 +4,14 @@ spring:
       maximum-pool-size: 50
       minimum-idle: 20
       idle-timeout: 30000
-      max-lifetime: 3600000             # 1 час
-      auto-commit: false                # default = true
-      leak-detection-threshold: 60000   # default = 0 (disabled), min allowed = 2000
+      max-lifetime: 3600000             # 60*60*1000
+      auto-commit: false
+      leak-detection-threshold: 60000
       data-source-properties:
-        cachePrepStmts: true            # default = false
+        cachePrepStmts: true
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
-        userServerPrepStmts: true       # default = false ?for newer versions of MySQL
+        userServerPrepStmts: true
         rewriteBatchedInserts: true
   jpa:
     properties:
@@ -21,8 +21,3 @@ spring:
           batch_size: 100
         order_inserts: true
         order_updates: true
-springdoc:
-  api-docs:
-    enabled: false
-  swagger-ui:
-    enabled: false

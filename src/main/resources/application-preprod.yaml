@@ -17,11 +17,3 @@ spring:
           batch_size: 50
         order_inserts: true
         order_updates: true
-logging:
-  level:
-    org.hibernate.sql: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.hibernate.orm.jdbc.bind: TRACE
-    com.zaxxer.hikari: TRACE
-    com.zaxxer.hikari.HikariConfig: DEBUG
-
