@@ -23,7 +23,7 @@ import java.time.LocalDate;
  */
 @Builder
 public record PatchEmployeeDto(
-//        @NotBlank - аннотация над JsonNullable'ом - работает так же
+
         JsonNullable<@NotBlank(message = "{firstname.not.blank}") String> firstName,
         JsonNullable<@Size(min = 1, max = 256, message = "{patronymic.size}") @NotBlankOrNull(message = "{patronymic.not.blank.or.null}") String> patronymic,
         JsonNullable<@NotBlank(message = "{lastname.not.blank}") String> lastName,
