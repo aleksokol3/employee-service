@@ -1,4 +1,4 @@
-package su.aleksokol3.employeeservice.model.api.mapper;
+package su.aleksokol3.employeeservice.mapper;
 
 import org.mapstruct.Mapper;
 import su.aleksokol3.employeeservice.model.entity.BaseEntity;
@@ -17,7 +17,7 @@ public abstract class BaseMapper {
      * @return id of entity
      * @param <T> Type of entity, should be {@link Serializable}
      */
-    <T extends Serializable> T entityToId(BaseEntity<T> entity) {
+    public <T extends Serializable> T entityToId(BaseEntity<T> entity) {
         return entity.getId();
     }
 }

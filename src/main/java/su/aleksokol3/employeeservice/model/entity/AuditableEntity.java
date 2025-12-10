@@ -12,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -21,9 +22,9 @@ import java.time.Instant;
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AuditableEntity {
+public abstract class AuditableEntity<T extends Serializable> implements BaseEntity<T> {
 
-    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    @Column(updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE")
     @CreatedDate
     private Instant createdAt;
 
@@ -31,12 +32,13 @@ public abstract class AuditableEntity {
     @LastModifiedDate
     private Instant modifiedAt;
 
+    @Column(updatable = false)
     @CreatedBy
     private String createdBy;
 
     @LastModifiedBy
     private String modifiedBy;
 
-    @Version                       // для оптимистической блокировки
-    private Long version;
+    @Version
+    private Integer version;
 }

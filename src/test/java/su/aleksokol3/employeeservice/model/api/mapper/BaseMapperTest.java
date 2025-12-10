@@ -3,6 +3,8 @@ package su.aleksokol3.employeeservice.model.api.mapper;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import su.aleksokol3.employeeservice.mapper.BaseMapper;
+import su.aleksokol3.employeeservice.mapper.BaseMapperImpl;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.util.DataUtils;
 

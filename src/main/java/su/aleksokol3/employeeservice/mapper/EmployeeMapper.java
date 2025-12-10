@@ -1,4 +1,4 @@
-package su.aleksokol3.employeeservice.model.api.mapper;
+package su.aleksokol3.employeeservice.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -15,7 +15,9 @@ public interface EmployeeMapper {
 
     ReadEmployeeDto entityToReadDto(Employee employee);
 
+    @IgnoreIdAuditVersionMappings
     Employee createDtoToEntity(CreateEmployeeDto dto);
 
+    @IgnoreIdAuditVersionMappings
     Employee updateEntity(PatchEmployeeDto dto, @MappingTarget Employee entity);
 }

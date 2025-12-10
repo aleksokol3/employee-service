@@ -3,6 +3,7 @@ package su.aleksokol3.employeeservice.model.api.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
 
 import java.time.Instant;
 import java.util.List;
@@ -27,4 +28,8 @@ public class PageDto<T> {
      * Timestamp of PageDto creation
      */
     Instant timestamp;
+
+    public static <T> PageDto<T> fromPage(Page<T> page) {
+        return new PageDto<>(page.toList(), page.getTotalElements(), Instant.now());
+    }
 }

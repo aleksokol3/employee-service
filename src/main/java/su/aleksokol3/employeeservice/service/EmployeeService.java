@@ -1,7 +1,6 @@
 package su.aleksokol3.employeeservice.service;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import su.aleksokol3.employeeservice.model.api.dto.PageDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
@@ -40,7 +39,7 @@ public interface EmployeeService {
      * @param dto {@link CreateEmployeeDto} with data to create employee.
      * @return {@link UUID} of creating employee.
      */
-    UUID create(CreateEmployeeDto dto);
+    ReadEmployeeDto create(CreateEmployeeDto dto);
 
     /**
      * Update un employee.

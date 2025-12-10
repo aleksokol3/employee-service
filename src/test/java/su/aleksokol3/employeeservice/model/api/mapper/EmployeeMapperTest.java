@@ -3,6 +3,9 @@ package su.aleksokol3.employeeservice.model.api.mapper;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import su.aleksokol3.employeeservice.mapper.EmployeeMapper;
+import su.aleksokol3.employeeservice.mapper.EmployeeMapperImpl;
+import su.aleksokol3.employeeservice.mapper.JsonNullableMapperImpl;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
@@ -10,7 +13,6 @@ import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.util.DataUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = {EmployeeMapperImpl.class, JsonNullableMapperImpl.class})
 @RequiredArgsConstructor

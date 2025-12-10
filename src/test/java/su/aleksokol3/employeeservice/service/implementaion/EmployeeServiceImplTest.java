@@ -20,7 +20,7 @@ import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
 import su.aleksokol3.employeeservice.exception.NotFoundException;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
 import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
-import su.aleksokol3.employeeservice.model.api.mapper.EmployeeMapper;
+import su.aleksokol3.employeeservice.mapper.EmployeeMapper;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.repository.EmployeeRepository;
 import su.aleksokol3.employeeservice.util.DataUtils;
@@ -119,9 +119,10 @@ class EmployeeServiceImplTest {
                         .thenReturn(transientEntity);
         Mockito.when(employeeRepository.save(any(Employee.class))).thenReturn(persistedEntity);
         // when
-        UUID savedEmployeeId = serviceUnderTest.create(createDto);
+        ReadEmployeeDto savedEmployee = serviceUnderTest.create(createDto);
         // then
-        assertThat(savedEmployeeId).isNotNull();
+        assertThat(savedEmployee).isNotNull();
+        assertThat(savedEmployee.id()).isNotNull();
     }
 
     @Test

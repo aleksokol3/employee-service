@@ -3,10 +3,7 @@ package su.aleksokol3.employeeservice.service.implementaion;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import su.aleksokol3.employeeservice.model.api.dto.PageDto;
@@ -16,12 +13,13 @@ import su.aleksokol3.employeeservice.model.api.dto.employee.ReadEmployeeDto;
 import su.aleksokol3.employeeservice.exception.NotFoundException;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
 import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
-import su.aleksokol3.employeeservice.model.api.mapper.EmployeeMapper;
+import su.aleksokol3.employeeservice.mapper.EmployeeMapper;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.repository.EmployeeRepository;
 import su.aleksokol3.employeeservice.service.EmployeeService;
+import su.aleksokol3.employeeservice.util.EmployeeSpecificationBuilder;
+import su.aleksokol3.employeeservice.util.PageUtils;
 
-import java.time.Instant;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -36,15 +34,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public PageDto<ReadEmployeeDto> findBy(SearchEmployeeFilter filter, Pageable pageable) {
         log.info("Finding employees by filter: {}", filter);
-        Specification<Employee> spec = buildSpecSearch(filter);
-        Pageable pageableSortIgnoreCase = preparePageable(pageable);
-        Page<Employee> employeesByFilterPage = employeeRepository.findAll(spec, pageableSortIgnoreCase);
+        Page<Employee> employeesByFilterPage = employeeRepository.findAll(
+                new EmployeeSpecificationBuilder().buildSearch(filter),
+                PageUtils.preparePageable(pageable)
+        );
 
-        long totalElements = employeesByFilterPage.getTotalElements();
-        List<ReadEmployeeDto> readEmployeeDtoList = employeesByFilterPage.stream()
-                .map(employeeMapper::entityToReadDto)
-                .toList();
-        return new PageDto<>(readEmployeeDtoList, totalElements, Instant.now());
+        return PageDto.fromPage(employeesByFilterPage
+                .map(employeeMapper::entityToReadDto));
     }
 
     @Override
@@ -57,11 +53,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional
     @Override
-    public UUID create(CreateEmployeeDto dto) {
+    public ReadEmployeeDto create(CreateEmployeeDto dto) {
         log.info("Creating new employee: {}", dto);
         Employee employee = employeeMapper.createDtoToEntity(dto);
         Employee savedEmployee = employeeRepository.save(employee);
-        return savedEmployee.getId();
+        return employeeMapper.entityToReadDto(savedEmployee);
     }
 
     @Transactional
@@ -86,42 +82,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void deleteBy(DeleteEmployeeFilter filter) {
         log.info("Deleting employee by filter: {}", filter);
-        Specification<Employee> spec = buildSpecDelete(filter);
-        employeeRepository.delete(spec);
-    }
-
-    private Specification<Employee> buildSpecSearch(SearchEmployeeFilter filter) {
-        return SpecBuilder.buildSpec(filter);
-//        return (root, query, cb) -> cb.and(
-//                filter.firstName() == null ? cb.conjunction() : cb.like(root.get("firstName"), filter.firstName()),
-//                filter.patronymic() == null ? cb.conjunction() : cb.like(root.get("patronymic"), filter.patronymic()),
-//                filter.lastName() == null ? cb.conjunction() : cb.like(root.get("lastName"), filter.lastName()),
-//                filter.ageFrom() == null ? cb.conjunction() : cb.between(root.get("age"), filter.ageFrom(), filter.ageTo()),
-//                filter.salaryFrom() == null ? cb.conjunction() : cb.between(root.get("salary"), filter.salaryFrom(), filter.salaryTo()),
-//                filter.hiringDateFrom() == null ? cb.conjunction() : cb.between(root.get("hiringDate"), filter.hiringDateFrom(), filter.hiringDateTo())
-//        );
-    }
-    private Specification<Employee> buildSpecDelete(DeleteEmployeeFilter filter) {
-        return SpecBuilder.buildSpec(filter);
-//        return (root, query, cb) -> cb.and(
-//                filter.firstName() == null ? cb.conjunction() : cb.like(root.get("firstName"), filter.firstName()),
-//                filter.patronymic() == null ? cb.conjunction() : cb.like(root.get("patronymic"), filter.patronymic()),
-//                filter.lastName() == null ? cb.conjunction() : cb.like(root.get("lastName"), filter.lastName()),
-//                filter.ageFrom() == null ? cb.conjunction() : cb.between(root.get("age"), filter.ageFrom(), filter.ageTo()),
-//                filter.hiringDateFrom() == null ? cb.conjunction() : cb.between(root.get("hiringDate"), filter.hiringDateFrom(), filter.hiringDateTo())
-//        );
-    }
-
-    private Pageable preparePageable(Pageable pageable) {
-        if (pageable.getPageSize() > 100) {
-            return sortIgnoreCase(PageRequest.of(pageable.getPageNumber(), 100, pageable.getSort()));
-        }
-        return sortIgnoreCase(pageable);
-    }
-    private Pageable sortIgnoreCase(Pageable pageable) {
-        List<Sort.Order> ordersIgnoreCase = pageable.getSort().stream()
-                .map(Sort.Order::ignoreCase)
-                .toList();
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(ordersIgnoreCase));
+        employeeRepository.delete(
+                new EmployeeSpecificationBuilder().buildDelete(filter));
     }
 }

@@ -1,4 +1,4 @@
-package su.aleksokol3.employeeservice.model.api.mapper;
+package su.aleksokol3.employeeservice.mapper;
 
 import org.mapstruct.Condition;
 import org.mapstruct.Mapper;
@@ -9,16 +9,6 @@ import org.openapitools.jackson.nullable.JsonNullable;
  */
 @Mapper(config = BaseMapperConfig.class)
 public abstract class JsonNullableMapper {
-
-    /**
-     * Wrap entity to JsonNullable
-     * @param entity Entity to wrap
-     * @return {@link JsonNullable}, containing {@link T} entity
-     * @param <T> Type of entity
-     */
-    public <T> JsonNullable<T> wrap(T entity) {
-        return JsonNullable.of(entity);
-    }
 
     /**
      * Unwrap entity from JsonNullable

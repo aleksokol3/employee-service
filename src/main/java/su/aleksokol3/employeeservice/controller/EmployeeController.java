@@ -3,7 +3,7 @@ package su.aleksokol3.employeeservice.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -46,6 +47,17 @@ class EmployeeController {
             tags = "Find",
             summary = "Find employees by filter",
             description = "Find employees by filter, page number, size of page; sort employees by field",
+            parameters = {
+                    @Parameter(name = "firstName", example = "John"),
+                    @Parameter(name = "patronymic", example = "Petrovich"),
+                    @Parameter(name = "lastName", example = "Johnson"),
+                    @Parameter(name = "ageFrom", example = "18"),
+                    @Parameter(name = "ageTo", example = "60"),
+                    @Parameter(name = "salaryFrom", example = "123.45"),
+                    @Parameter(name = "salaryTo", example = "900"),
+                    @Parameter(name = "hiringDateFrom", example = "2024-12-31"),
+                    @Parameter(name = "hiringDateTo", example = "2025-12-31")
+            },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Returns found employees by filter on the specified page of the specified size in the specified order; and total number of founded employees with timestamp of the response"),
                     @ApiResponse(responseCode = "400", description = "Validation failure", content = @Content)
@@ -54,7 +66,7 @@ class EmployeeController {
     @GetMapping
     public ResponseEntity<PageDto<ReadEmployeeDto>> findBy(
             @Valid @ParameterObject SearchEmployeeFilter filter,
-            @NotNull @ParameterObject @PageableDefault(page = 0, size = 10) Pageable pageable) {
+            @NotNull @ParameterObject @PageableDefault(page = 0, size = 50) Pageable pageable) {
         return ResponseEntity.ok(employeeService.findBy(filter, pageable));
     }
 
@@ -87,18 +99,32 @@ class EmployeeController {
     @Operation(
             tags = "Create",
             summary = "Create a new employee",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "An employee to create"),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "An employee to create",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            examples = @ExampleObject("""
+                                    {
+                                       "firstName": "John",
+                                       "patronymic": null,
+                                       "lastName": "Johnson",
+                                       "age": 18,
+                                       "salary": 123.45,
+                                       "hiringDate": "2024-12-31"
+                                    }"""
+                            )
+                    )
+            ),
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Returns UUID of the created employee"),
+                    @ApiResponse(responseCode = "201", description = "A new employee is created"),
                     @ApiResponse(responseCode = "400", description = "Validation failure", content = @Content)
             }
     )
     @PostMapping
-    public ResponseEntity<UUID> create(@RequestBody @Valid CreateEmployeeDto dto) {
-        UUID uuid = employeeService.create(dto);
-        String location = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
-        return ResponseEntity.created(URI.create(location + "/" + uuid))
-                .body(uuid);
+    public ResponseEntity<Void> create(@RequestBody @Valid CreateEmployeeDto dto) {
+        ReadEmployeeDto readEmployeeDto = employeeService.create(dto);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(readEmployeeDto.id()).toUri();
+        return ResponseEntity.created(location).build();
     }
 
     /**
@@ -131,7 +157,16 @@ class EmployeeController {
      */
     @Operation(
             tags = "Delete",
-            summary = "Delete employees by filter"
+            summary = "Delete employees by filter",
+            parameters = {
+                    @Parameter(name = "firstName", example = "John"),
+                    @Parameter(name = "patronymic", example = "Petrovich"),
+                    @Parameter(name = "lastName", example = "Johnson"),
+                    @Parameter(name = "ageFrom", example = "18"),
+                    @Parameter(name = "ageTo", example = "60"),
+                    @Parameter(name = "hiringDateFrom", example = "2024-12-31"),
+                    @Parameter(name = "hiringDateTo", example = "2025-12-31")
+            }
     )
     @DeleteMapping
     public ResponseEntity<Void> deleteBy(@Valid @ParameterObject DeleteEmployeeFilter filter) {
