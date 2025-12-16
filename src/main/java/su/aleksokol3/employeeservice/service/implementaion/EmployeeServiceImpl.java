@@ -35,7 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public PageDto<ReadEmployeeDto> findBy(SearchEmployeeFilter filter, Pageable pageable) {
         log.info("Finding employees by filter: {}", filter);
         Page<Employee> employeesByFilterPage = employeeRepository.findAll(
-                new EmployeeSpecificationBuilder().buildSearch(filter),
+                new EmployeeSpecificationBuilder().buildSearch(filter, pageable.getSort().isEmpty()),
                 PageUtils.preparePageable(pageable)
         );
 

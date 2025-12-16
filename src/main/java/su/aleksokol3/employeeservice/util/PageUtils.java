@@ -12,7 +12,7 @@ public class PageUtils {
 
     public static Pageable preparePageable(Pageable pageable) {
         if (pageable.getPageSize() > maxPageSize) {
-            return sortIgnoreCase(PageRequest.of(pageable.getPageNumber(), maxPageSize, pageable.getSort()));
+            pageable = PageRequest.of(pageable.getPageNumber(), maxPageSize, pageable.getSort());
         }
         return sortIgnoreCase(pageable);
     }

@@ -9,7 +9,7 @@
     </parent>
     <groupId>su.aleksokol3</groupId>
     <artifactId>employee-service</artifactId>
-    <version>0.12.0</version>
+    <version>0.13.0</version>
     <name>employee-service</name>
     <description>employee-service</description>
     <properties>

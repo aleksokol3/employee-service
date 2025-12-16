@@ -1,33 +1,26 @@
 package su.aleksokol3.employeeservice.util;
 
+import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract class whose implementations construct {@link Specification} of entity based on the given filter
+ */
 public abstract class SpecificationBuilder<T> {
-    private final List<Specification<T>> specificationList = new ArrayList<>();
 
-    public Specification<T> build() {
-        Specification<T> result = Specification.unrestricted();
-        for (Specification<T> tSpecification : specificationList) {
-            result = result.and(tSpecification);
-        }
-        return result;
-    }
-
-    protected SpecificationBuilder<T> and(Specification<T> spec) {
-        specificationList.add(spec);
-        return this;
-    }
-
-//    protected <V> Specification<T> equals(String fieldName, V value) {
-//        return (root, query, cb) -> value != null ? cb.equal(root.get(fieldName), value) : cb.conjunction();
-//    }
-
+    /**
+     * Creates specification using SQL operator LIKE
+     *
+     * @param fieldName name of the entity field
+     * @param value value of the entity field
+     * @return {@link Specification}
+     */
     protected Specification<T> like(String fieldName, String value) {
         return (root, query, cb) -> {
-            if (value == null || value.trim().isEmpty()) {
+            if (value == null || value.isBlank()) {
                 return cb.conjunction();
             } else {
                 return cb.like(cb.lower(root.get(fieldName)), String.format("%%%s%%", value.toLowerCase()));
@@ -35,6 +28,16 @@ public abstract class SpecificationBuilder<T> {
         };
     }
 
+
+    /**
+     * Creates specification using SQL operator BETWEEN; or '>=' if 'to' field is null; or '<=' if 'from' field is null.
+     *
+     * @param fieldName name of the entity field
+     * @param from value of the field that has a smaller value
+     * @param to value of the field that has a greater value
+     * @return {@link Specification}
+     * @param <V> generic type of value of the entity field, is {@link Comparable}
+     */
     protected <V extends Comparable<? super V>> Specification<T> between(String fieldName, V from, V to) {
         return (root, query, cb) -> {
             if (from == null && to == null) {
@@ -50,31 +53,36 @@ public abstract class SpecificationBuilder<T> {
         };
     }
 
-//    protected Specification<T> isTrue(String fieldName, Boolean value) {
-//        return (root, query, cb) -> {
-//            if (value == null) {
-//                return cb.conjunction();
-//            }
-//            return value ? cb.isTrue(root.get(fieldName)) : cb.isFalse(root.get(fieldName));
-//        };
-//    }
-//
-//    protected <V> Specification<T> in(String fieldName, Collection<V> values) {
-//        return (root, query, cb) -> {
-//            if (values == null || values.isEmpty()) {
-//                return cb.conjunction();
-//            }
-//            return root.get(fieldName).in(values);
-//        };
-//    }
-//
-//    protected <V> Specification<T> joinEquals(String joinField, String fieldName, V value) {
-//        return (root, query, cb) -> {
-//            if (value == null) {
-//                return cb.conjunction();
-//            }
-//            Join<T, ?> join = root.join(joinField, JoinType.INNER);
-//            return cb.equal(join.get(fieldName), value);
-//        };
-//    }
+    /**
+     * Creates specification using DB similarity function, for example: similarity(e1_0.last_name, 'Johnson').
+     * Adds similarity sorting if no sorting is specified in the request query.
+     *
+     * @param similarityFields list of fields by which a similarity search will be performed
+     * @param queryValue value of the query string
+     * @param notSorted if is {@code true}, then will be similarity sorting, otherwise sorting specified in the request query
+     * @return {@link Specification}
+     */
+    protected Specification<T> similarity(List<String> similarityFields, String queryValue, boolean notSorted) {
+        return (root, query, cb) -> {
+            if (queryValue == null || queryValue.isBlank()) {
+                return cb.conjunction();
+            }
+
+            Double threshold = 0.3;
+            List<Expression<Double>> expressionList = new ArrayList<>();
+            List<Predicate> predicateList = new ArrayList<>();
+            for (String simField : similarityFields) {
+                Expression<Double> expression = cb.function("similarity", Double.class, root.get(simField), cb.literal(queryValue));
+                expressionList.add(expression);
+                predicateList.add(cb.greaterThan(expression, threshold));
+            }
+
+            if (notSorted) {
+                Expression<Double> maxSimilarity = cb.function("greatest", Double.class, expressionList.toArray(Expression[]::new));
+                query.orderBy(cb.desc(maxSimilarity));
+            }
+
+            return cb.or(predicateList.toArray(Predicate[]::new));
+        };
+    }
 }
