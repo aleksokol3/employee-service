@@ -21,10 +21,16 @@ import su.aleksokol3.employeeservice.validation.*;
 public record PatchEmployeeDto(
 
         JsonNullable<@NotBlank(message = "{firstname.not.blank}") String> firstName,
-        JsonNullable<@Size(min = 1, max = 256, message = "{patronymic.size}") @NotBlankOrNull(message = "{patronymic.not.blank.or.null}") String> patronymic,
+        JsonNullable<
+                @Size(min = 1, max = 256, message = "{patronymic.size}")
+                @NotBlankOrNull(message = "{patronymic.not.blank.or.null}") String> patronymic,
         JsonNullable<@NotBlank(message = "{lastname.not.blank}") String> lastName,
         JsonNullable<@Min(value = 1, message = "{age.min}") Integer> age,
-        JsonNullable<@BigDecimal(message = "{salary.big.decimal}") @MinString(value = 0, message = "{salary.min}") String> salary,
-        JsonNullable<@LocalDate(message = "{hiringdate.local.date}") @PastOrPresentString(message = "{hiringdate.past.or.present}") String> hiringDate
+        JsonNullable<
+                @BigDecimal(message = "{salary.big.decimal}")
+                @MinString(value = 0, message = "{salary.min}") String> salary,
+        JsonNullable<
+                @LocalDate(message = "{hiringdate.local.date}")
+                @PastOrPresentString(message = "{hiringdate.past.or.present}") String> hiringDate
 ) {
 }

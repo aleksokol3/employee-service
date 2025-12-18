@@ -18,7 +18,9 @@ import java.time.format.DateTimeParseException;
  * <p>
  * The annotated element must be a date in the past or in the present.
  * <p>
- * Now is defined by the ClockProvider attached to the Validator or ValidatorFactory. The default clockProvider defines the current time according to the virtual machine, applying the current default time zone if needed.
+ * Now is defined by the ClockProvider attached to the Validator or ValidatorFactory.
+ * The default clockProvider defines the current time according to the virtual machine,
+ * applying the current default time zone if needed.
  * <p>
  * Accepts {@link CharSequence}, which must match format of {@link java.time.LocalDate} to be valid.
  * <p>

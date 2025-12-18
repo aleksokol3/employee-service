@@ -15,4 +15,5 @@ import java.lang.annotation.Target;
 @Mapping(target = "modifiedBy", ignore = true)
 @Mapping(target = "version", ignore = true)
 @Mapping(target = "id", ignore = true)
-public @interface IgnoreIdAuditVersionMappings {}
+public @interface IgnoreIdAuditVersionMappings {
+}

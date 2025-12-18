@@ -1,8 +1,6 @@
 package su.aleksokol3.employeeservice.exception;
 
 import lombok.Getter;
-import org.springframework.web.bind.annotation.RestController;
-
 /**
  * NotFoundException is the {@link RuntimeException} class for exceptions when an entity is not found in the repository.
  */

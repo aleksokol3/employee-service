@@ -55,11 +55,11 @@ public abstract class SpecificationBuilder<T> {
 
     /**
      * Creates specification using DB similarity function, for example: similarity(e1_0.last_name, 'Johnson').
-     * Adds similarity sorting if no sorting is specified in the request query.
+     * Adds similarity sorting if no sorting is specified in the request.
      *
      * @param similarityFields list of fields by which a similarity search will be performed
      * @param queryValue value of the query string
-     * @param notSorted if is {@code true}, then will be similarity sorting, otherwise sorting specified in the request query
+     * @param notSorted if {@code true} sorts by similarity; otherwise, sorts by the specified sorting field(s)
      * @return {@link Specification}
      */
     protected Specification<T> similarity(List<String> similarityFields, String queryValue, boolean notSorted) {
@@ -72,13 +72,15 @@ public abstract class SpecificationBuilder<T> {
             List<Expression<Double>> expressionList = new ArrayList<>();
             List<Predicate> predicateList = new ArrayList<>();
             for (String simField : similarityFields) {
-                Expression<Double> expression = cb.function("similarity", Double.class, root.get(simField), cb.literal(queryValue));
+                Expression<Double> expression = cb.function(
+                        "similarity", Double.class, root.get(simField), cb.literal(queryValue));
                 expressionList.add(expression);
                 predicateList.add(cb.greaterThan(expression, threshold));
             }
 
             if (notSorted) {
-                Expression<Double> maxSimilarity = cb.function("greatest", Double.class, expressionList.toArray(Expression[]::new));
+                Expression<Double> maxSimilarity = cb.function(
+                        "greatest", Double.class, expressionList.toArray(Expression[]::new));
                 query.orderBy(cb.desc(maxSimilarity));
             }
 

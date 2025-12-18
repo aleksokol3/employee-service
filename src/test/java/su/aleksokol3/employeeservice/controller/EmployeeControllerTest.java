@@ -28,7 +28,6 @@ import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.service.EmployeeService;
 import su.aleksokol3.employeeservice.util.DataUtils;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
@@ -83,8 +82,10 @@ class EmployeeControllerTest {
     void givenIncorrectId_whenFindById_thenExceptionIsThrown() throws Exception {
         // given
         UUID id = UUID.fromString("11e5eb40-472e-30d2-9591-036287d20258");
-        String employeeLocalizedName = messageSource.getMessage("employee", new Object[0], Locale.getDefault());
-        String errorLocalizedMessage = messageSource.getMessage("not.found.exception", new Object[]{employeeLocalizedName, id.toString()}, Locale.getDefault());
+//        String employeeLocalizedName = messageSource.getMessage("employee", new Object[0], Locale.getDefault());
+//        String errorLocalizedMessage = messageSource.getMessage(
+//                  "not.found.exception", new Object[]{employeeLocalizedName, id.toString()}, Locale.getDefault());
+        String errorMessage = "not.found.exception";
         Mockito.when(employeeService.findById(any(UUID.class)))
                 .thenThrow(new NotFoundException("not.found.exception", "employee", id.toString()));
         // when
@@ -95,7 +96,7 @@ class EmployeeControllerTest {
         // then
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status", CoreMatchers.is(HttpStatus.NOT_FOUND.value())))
-                .andExpect(jsonPath("$.error", CoreMatchers.is(errorLocalizedMessage)));
+                .andExpect(jsonPath("$.error", CoreMatchers.is(errorMessage)));
     }
 
     @Test
@@ -124,15 +125,16 @@ class EmployeeControllerTest {
     @DisplayName("Test create functionality")
     void givenCreateEmployeeDto_whenCreateEmployee_thenSuccessResponse() throws Exception {
         // given
-        CreateEmployeeDto dto = DataUtils.getJuanRodriguezCreateDto();
+        CreateEmployeeDto createDto = DataUtils.getJuanRodriguezCreateDto();
         Employee entity = DataUtils.getJuanRodriguezPersisted();
+        ReadEmployeeDto readDto = DataUtils.getJuanRodriguezReadDto();
         Mockito.when(employeeService.create(any(CreateEmployeeDto.class)))
-                .thenReturn(entity.getId());
+                .thenReturn(readDto);
         // when
         ResultActions result = mockMvc.perform(
                 post("/api/v1/employees")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)));
+                        .content(objectMapper.writeValueAsString(createDto)));
         // then
         result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$", CoreMatchers.is(entity.getId().toString())));
@@ -161,7 +163,6 @@ class EmployeeControllerTest {
     void givenPatchDto_whenUpdate_thenSuccessResponse() throws Exception {
         // given
         PatchEmployeeDto patchDto = DataUtils.getJuanRodriguezPatchDto();
-        BigDecimal salary = BigDecimal.ONE.multiply(patchDto.salary().get());
         Employee persistedEntity = DataUtils.getJuanRodriguezPersisted();
         ReadEmployeeDto readDto = DataUtils.getJuanRodriguezUpdatedReadDto();
         Mockito.when(employeeService.update(any(UUID.class), any(PatchEmployeeDto.class)))

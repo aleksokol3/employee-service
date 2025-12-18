@@ -40,8 +40,10 @@ class EmployeeController {
      * Get a list of employees, using filter and pageable.
      *
      * @param filter Searching filter. Should be valid.
-     * @param pageable {@link Pageable}, containing page, size, and sort. Its default params: page = 0, size = 10, there isn't sorting.
-     * @return {@link ResponseEntity} of {@link PageDto}, containing a list of employees by filter on the desired page, total amount of employees matching this filter, and timestamp of creating response
+     * @param pageable {@link Pageable}, containing page, size, and sort.
+     * Its default params: page = 0, size = 10, there isn't sorting.
+     * @return {@link ResponseEntity} of {@link PageDto}, containing a list of employees by filter on the desired page,
+     * total amount of employees matching this filter, and timestamp of creating response
      */
     @Operation(
             tags = "Find",
@@ -59,7 +61,12 @@ class EmployeeController {
                     @Parameter(name = "hiringDateTo", example = "2025-12-31")
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Returns found employees by filter on the specified page of the specified size in the specified order; and total number of founded employees with timestamp of the response"),
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = """
+                                    Returns found employees by filter on the specified page
+                                    of the specified size in the specified order;
+                                    and total number of founded employees with timestamp of the response"""),
                     @ApiResponse(responseCode = "400", description = "Validation failure", content = @Content)
             }
     )
@@ -82,7 +89,8 @@ class EmployeeController {
             parameters = @Parameter(name = "id", example = "01e5eb48-472e-44d2-9591-036287d20258"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Returns an employee by given id"),
-                    @ApiResponse(responseCode = "404", description = "Not found an employee by given id", content = @Content)
+                    @ApiResponse(responseCode = "404", description = "Not found an employee by given id",
+                            content = @Content)
             }
     )
     @GetMapping("/{id}")
@@ -123,7 +131,8 @@ class EmployeeController {
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody @Valid CreateEmployeeDto dto) {
         ReadEmployeeDto readEmployeeDto = employeeService.create(dto);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{id}").buildAndExpand(readEmployeeDto.id()).toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri()
+                .path("/{id}").buildAndExpand(readEmployeeDto.id()).toUri();
         return ResponseEntity.created(location).build();
     }
 
@@ -141,12 +150,15 @@ class EmployeeController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "An employee to update"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Returns an updated employee"),
-                    @ApiResponse(responseCode = "400", description = "Validation failure", content = @Content),
-                    @ApiResponse(responseCode = "404", description = "Not found an employee to update", content = @Content)
+                    @ApiResponse(responseCode = "400", description = "Validation failure",
+                            content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Not found an employee to update",
+                            content = @Content)
             }
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<ReadEmployeeDto> update(@PathVariable("id") UUID id, @RequestBody @Valid PatchEmployeeDto dto) {
+    public ResponseEntity<ReadEmployeeDto> update(@PathVariable("id") UUID id,
+                                                  @RequestBody @Valid PatchEmployeeDto dto) {
         return ResponseEntity.ok(employeeService.update(id, dto));
     }
 

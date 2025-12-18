@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,8 +12,8 @@ import su.aleksokol3.employeeservice.UnitTestBase;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
 import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.entity.Employee;
-import su.aleksokol3.employeeservice.service.implementaion.SpecBuilder;
 import su.aleksokol3.employeeservice.util.DataUtils;
+import su.aleksokol3.employeeservice.util.EmployeeSpecificationBuilder;
 
 import java.util.List;
 import java.util.UUID;
@@ -68,18 +67,20 @@ public class EmployeeRepositoryTest extends UnitTestBase {
 
     @Test
     @DisplayName("Test find by filter functionality")
-    public void given4employeesCreated_whenFindByFilter_then2FilteredEmployeesAreReturned() {   // findByFilter (filter, pageable)
+    public void given4employeesCreated_whenFindByFilter_then2FilteredEmployeesAreReturned() {
         // given
         Employee juanRodriguezTransient = DataUtils.getJuanRodriguezTransient();
         Employee luisHernandezTransient = DataUtils.getLuisHernandezTransient();
         Employee mariaAlonsoTransient = DataUtils.getMariaAlonsoTransient();
         Employee ivanAlonsoTransient = DataUtils.getIvanAlonsoTransient();
-        employeeRepository.saveAll(List.of(juanRodriguezTransient, luisHernandezTransient, mariaAlonsoTransient, ivanAlonsoTransient));
+        employeeRepository.saveAll(List.of(
+                juanRodriguezTransient, luisHernandezTransient, mariaAlonsoTransient, ivanAlonsoTransient));
 
         SearchEmployeeFilter filter = SearchEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
-        Specification<Employee> spec = SpecBuilder.buildSpec(filter);
+//        Specification<Employee> spec = SpecBuilder.buildSpec(filter);
+        Specification<Employee> spec = new EmployeeSpecificationBuilder().buildSearch(filter, true);
         Pageable pageable = PageRequest.of(0, 5);
         // when
         Page<Employee> byFilter = employeeRepository.findAll(spec, pageable);
@@ -138,16 +139,24 @@ public class EmployeeRepositoryTest extends UnitTestBase {
         Employee ivanAlonsoTransient = DataUtils.getIvanAlonsoTransient();
         Employee gabrielMarquezTransient = DataUtils.getGabrielMarquezTransient();
 
-        employeeRepository.saveAll(List.of(juanRodriguezTransient, luisHernandezTransient, mariaAlonsoTransient, ivanAlonsoTransient, gabrielMarquezTransient));
+        employeeRepository.saveAll(List.of(
+                juanRodriguezTransient,
+                luisHernandezTransient,
+                mariaAlonsoTransient,
+                ivanAlonsoTransient,
+                gabrielMarquezTransient));
 
         DeleteEmployeeFilter filter = DeleteEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
-        Specification<Employee> spec = SpecBuilder.buildSpec(filter);
+//        Specification<Employee> spec = SpecBuilder.buildSpec(filter);
+        Specification<Employee> spec = new EmployeeSpecificationBuilder().buildDelete(filter);
+
         // when
         long deleted = employeeRepository.delete(spec);
         SearchEmployeeFilter findAllFilter = SearchEmployeeFilter.builder().build();
-        Specification<Employee> specAll = SpecBuilder.buildSpec(findAllFilter);
+        Specification<Employee> specAll = new EmployeeSpecificationBuilder().buildSearch(findAllFilter, true);
+//        Specification<Employee> specAll = SpecBuilder.buildSpec(findAllFilter);
         Page<Employee> byFilter = employeeRepository.findAll(specAll, PageRequest.of(0, 10));
         // then
         assertThat(deleted).isEqualTo(2);

@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * RestControllerExceptionHandler class is descendant of {@link ResponseEntityExceptionHandler} for customizing exceptions.
+ * A subclass of {@link ResponseEntityExceptionHandler} designed for customizing exception responses.
  */
 @RestControllerAdvice(basePackages = "su.aleksokol3.employeeservice.controller")
 @RequiredArgsConstructor
@@ -27,7 +27,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     private final MessageSource messageSource;
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now());
         List<String> errors = ex.getFieldErrors()
@@ -42,7 +43,8 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
     }
 
     @Override
-    protected ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+    protected ResponseEntity<Object> handleHandlerMethodValidationException(
+            HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now());
         List<String> errors = ex.getAllErrors()
@@ -80,7 +82,11 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now());
         String entityNameLocalized = messageSource.getMessage(ex.getEntityName(), new Object[0], req.getLocale());
-        body.put("error", messageSource.getMessage(ex.getErrorMessageCode(), new Object[]{entityNameLocalized, ex.getEntityId()}, req.getLocale()));
+      //  body.put(ex.getEntityName(), ex.getErrorMessageCode());
+//        body.put("error", messageSource.getMessage(
+//                  ex.getErrorMessageCode(), new Object[]{entityNameLocalized, ex.getEntityId()}, req.getLocale()));
+        body.put("error", ex.getErrorMessageCode());
+        body.put("description", "ID %s of %s is not found".formatted(ex.getEntityId(), ex.getEntityName()));
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND.value());
         problemDetail.setProperties(body);
         return ResponseEntity.of(problemDetail).build();

@@ -1,4 +1,4 @@
-package su.aleksokol3.employeeservice.integration;
+package su.aleksokol3.employeeservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -7,25 +7,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.MultiValueMapAdapter;
-import su.aleksokol3.employeeservice.IntegrationTestBase;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.repository.EmployeeRepository;
-import su.aleksokol3.employeeservice.service.implementaion.SpecBuilder;
 import su.aleksokol3.employeeservice.util.DataUtils;
+import su.aleksokol3.employeeservice.util.EmployeeSpecificationBuilder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,9 +36,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RequiredArgsConstructor
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
-@SpringBootTest                     // создаёт и загружает полный ApplicationContext
-class EmployeeControllerIT extends IntegrationTestBase {
+//@ActiveProfiles("it")
+//@SpringBootTest
+class EmployeeControllerIT extends BaseIT {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
@@ -242,7 +239,8 @@ class EmployeeControllerIT extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON)
                         .queryParams(multiValueMap));
         SearchEmployeeFilter findAllFilter = SearchEmployeeFilter.builder().build();
-        Specification<Employee> spec = SpecBuilder.buildSpec(findAllFilter);
+        Specification<Employee> spec = new EmployeeSpecificationBuilder().buildSearch(findAllFilter, true);
+//        Specification<Employee> spec = SpecBuilder.buildSpec(findAllFilter);
         Page<Employee> byFilter = employeeRepository.findAll(spec, PageRequest.of(0, 10));
         // then
         result.andExpect(status().isNoContent());
