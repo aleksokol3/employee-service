@@ -1,6 +1,12 @@
 package su.aleksokol3.employeeservice.mapper;
 
-import org.mapstruct.*;
+
+import org.mapstruct.Builder;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.MapperConfig;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * Base configs for other mappers
@@ -10,8 +16,7 @@ import org.mapstruct.*;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
         unmappedTargetPolicy = ReportingPolicy.ERROR,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-        builder = @Builder(disableBuilder = true
-        )
+        builder = @Builder(disableBuilder = true)
 )
 public interface BaseMapperConfig {
 }

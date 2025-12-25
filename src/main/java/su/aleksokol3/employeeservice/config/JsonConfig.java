@@ -1,6 +1,6 @@
 package su.aleksokol3.employeeservice.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +18,8 @@ public class JsonConfig {
     @Bean
     Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder(JsonNullableModule jsonNullableModule) {
         Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-        builder.serializationInclusion(JsonInclude.Include.NON_NULL)
-                .modulesToInstall(jsonNullableModule)
+        builder.modulesToInstall(jsonNullableModule)
+                .featuresToEnable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
                 .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return builder;
     }

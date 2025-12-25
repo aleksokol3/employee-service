@@ -8,7 +8,7 @@
 -- Versioning strategy: Semantic Versioning
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
-CREATE INDEX trgm_idx_employee
+CREATE INDEX IF NOT EXISTS trgm_idx_employee
     ON employee
         USING GIN (
                    last_name gin_trgm_ops,

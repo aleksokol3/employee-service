@@ -13,7 +13,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import su.aleksokol3.employeeservice.model.api.dto.PageDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
@@ -39,9 +46,9 @@ class EmployeeController {
     /**
      * Get a list of employees, using filter and pageable.
      *
-     * @param filter Searching filter. Should be valid.
-     * @param pageable {@link Pageable}, containing page, size, and sort.
-     * Its default params: page = 0, size = 10, there isn't sorting.
+     * @param filter Searching filter. Should be valid
+     * @param pageable {@link Pageable}, containing page, size, and sort
+     * Its default params: page = 0, size = 10, there isn't sorting
      * @return {@link ResponseEntity} of {@link PageDto}, containing a list of employees by filter on the desired page,
      * total amount of employees matching this filter, and timestamp of creating response
      */
@@ -80,7 +87,7 @@ class EmployeeController {
     /**
      * Get an employee by id.
      *
-     * @param id {@link UUID} of an employee to get.
+     * @param id {@link UUID} of an employee to get
      * @return {@link ResponseEntity} of {@link ReadEmployeeDto}
      */
     @Operation(
@@ -101,8 +108,8 @@ class EmployeeController {
     /**
      * Create an employee.
      *
-     * @param dto {@link CreateEmployeeDto}. Should be valid.
-     * @return {@link ResponseEntity} of {@link UUID} (of the created employee).
+     * @param dto {@link CreateEmployeeDto}. Should be valid
+     * @return {@link ResponseEntity} of the created employee {@link ReadEmployeeDto}
      */
     @Operation(
             tags = "Create",
@@ -129,19 +136,19 @@ class EmployeeController {
             }
     )
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody @Valid CreateEmployeeDto dto) {
+    public ResponseEntity<ReadEmployeeDto> create(@RequestBody @Valid CreateEmployeeDto dto) {
         ReadEmployeeDto readEmployeeDto = employeeService.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequestUri()
                 .path("/{id}").buildAndExpand(readEmployeeDto.id()).toUri();
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(readEmployeeDto);
     }
 
     /**
      * Update an employee by given id.
      *
-     * @param id {@link UUID} of employee to update.
-     * @param dto {@link PatchEmployeeDto}. Should be valid.
-     * @return {@link ResponseEntity} of {@link ReadEmployeeDto} (updated employee).
+     * @param id {@link UUID} of employee to update
+     * @param dto {@link PatchEmployeeDto}. Should be valid
+     * @return {@link ResponseEntity} of {@link ReadEmployeeDto} (updated employee)
      */
     @Operation(
             tags = "Update",
@@ -165,7 +172,7 @@ class EmployeeController {
     /**
      * Delete an employee by filter.
      *
-     * @param filter {@link DeleteEmployeeFilter}. Should be valid.
+     * @param filter {@link DeleteEmployeeFilter}. Should be valid
      */
     @Operation(
             tags = "Delete",
@@ -189,7 +196,7 @@ class EmployeeController {
     /**
      * Delete an employee by given id.
      *
-     * @param id {@link UUID} of employee to delete.
+     * @param id {@link UUID} of employee to delete
      */
     @Operation(
             tags = "Delete",

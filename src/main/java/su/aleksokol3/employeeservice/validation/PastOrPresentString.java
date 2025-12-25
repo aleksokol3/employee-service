@@ -37,7 +37,9 @@ public @interface PastOrPresentString {
     class PastOrPresentValidatorForStringLocalDate implements ConstraintValidator<PastOrPresentString, CharSequence> {
         @Override
         public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
-            if (value == null) return true;
+            if (value == null) {
+                return true;
+            }
             Clock clock = context.getClockProvider().getClock();
             java.time.LocalDate now = java.time.LocalDate.now(clock);
             java.time.LocalDate validatedPastOrPresentDate;

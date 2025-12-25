@@ -15,6 +15,7 @@ public class DataUtils {
     public static Employee getJuanRodriguezTransient() {
         return Employee.builder()
                 .firstName("Juan")
+                .patronymic("Ivanovich")
                 .lastName("Rodriguez")
                 .age(40)
                 .salary(BigDecimal.valueOf(222.22))
@@ -25,15 +26,17 @@ public class DataUtils {
         return Employee.builder()
                 .id(UUID.fromString("10e5eb40-472e-40d2-9591-036287d20258"))
                 .firstName("Juan")
+                .patronymic("Ivanovich")
                 .lastName("Rodriguez")
                 .age(40)
-                .salary(BigDecimal.valueOf(222.22))
+                .salary(BigDecimal.valueOf(222.2200))
                 .hiringDate(LocalDate.of(2020, 10, 15))
                 .build();
     }
     public static CreateEmployeeDto getJuanRodriguezCreateDto() {
         return CreateEmployeeDto.builder()
                 .firstName("Juan")
+                .patronymic("Ivanovich")
                 .lastName("Rodriguez")
                 .age(40)
                 .salary("222.22")
@@ -43,7 +46,7 @@ public class DataUtils {
     public static CreateEmployeeDto getJuanRodriguezInvalidCreateDto() {
         return CreateEmployeeDto.builder()
                 .firstName("Juan")
-                .patronymic("V")
+                .patronymic("Ivanovich")
                 .lastName("Rodriguez")
                 .age(-40)                               // Invalid data
                 .salary("222.22")
@@ -54,16 +57,17 @@ public class DataUtils {
         return ReadEmployeeDto.builder()
                 .id(UUID.fromString("10e5eb40-472e-40d2-9591-036287d20258"))
                 .firstName("Juan")
-                .patronymic("V")
+                .patronymic("Ivanovich")
                 .lastName("Rodriguez")
                 .age(40)
-                .salary(BigDecimal.valueOf(222.22))
+                .salary(BigDecimal.valueOf(222.222))
                 .hiringDate(LocalDate.of(2020, 10, 15))
                 .build();
     }
     public static PatchEmployeeDto getJuanRodriguezPatchDto() {
         return PatchEmployeeDto.builder()
                 .firstName(JsonNullable.undefined())
+                .patronymic(JsonNullable.of(null))
                 .patronymic(JsonNullable.undefined())
                 .lastName(JsonNullable.undefined())
                 .age(JsonNullable.undefined())
@@ -74,7 +78,7 @@ public class DataUtils {
     public static PatchEmployeeDto getJuanRodriguezInvalidPatchDto() {
         return PatchEmployeeDto.builder()
                 .firstName(JsonNullable.undefined())
-                .patronymic(JsonNullable.undefined())
+                .patronymic(JsonNullable.of(null))
                 .lastName(JsonNullable.undefined())
                 .age(JsonNullable.of(-40))              // Invalid data
                 .salary(JsonNullable.undefined())
@@ -85,6 +89,7 @@ public class DataUtils {
         return Employee.builder()
                 .id(UUID.fromString("10e5eb40-472e-40d2-9591-036287d20258"))
                 .firstName("Juan")
+                .patronymic(null)
                 .lastName("Rodriguez")
                 .age(40)
                 .salary(BigDecimal.valueOf(777.77))
@@ -95,6 +100,7 @@ public class DataUtils {
         return ReadEmployeeDto.builder()
                 .id(UUID.fromString("10e5eb40-472e-40d2-9591-036287d20258"))
                 .firstName("Juan")
+                .patronymic(null)
                 .lastName("Rodriguez")
                 .age(40)
                 .salary(BigDecimal.valueOf(777.77))

@@ -6,7 +6,7 @@ import org.springframework.data.domain.AuditorAware;
 
 import java.util.Optional;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class AuditConfiguration {
     @Bean
     public AuditorAware<String> auditorAware() {

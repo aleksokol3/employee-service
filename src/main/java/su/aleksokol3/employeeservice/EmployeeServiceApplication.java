@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @OpenAPIDefinition(
-        info = @Info(title = "Employee service API", version = "0.11.6"),
+        info = @Info(title = "Employee service API", version = "${app.version}"),
         servers = {@Server(url = "http://localhost:8080", description = "Local server")}
 )
 @EnableJpaAuditing

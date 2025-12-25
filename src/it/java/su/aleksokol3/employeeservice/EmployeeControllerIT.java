@@ -36,8 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RequiredArgsConstructor
 @AutoConfigureMockMvc
-//@ActiveProfiles("it")
-//@SpringBootTest
 class EmployeeControllerIT extends BaseIT {
 
     private final MockMvc mockMvc;
@@ -64,7 +62,7 @@ class EmployeeControllerIT extends BaseIT {
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", CoreMatchers.is(entity.getId().toString())))
                 .andExpect(jsonPath("$.firstName", CoreMatchers.is(entity.getFirstName())))
-//                .andExpect(jsonPath("$.patronymic", CoreMatchers.is(entity.getPatronymic())))         // ???
+                .andExpect(jsonPath("$.patronymic", CoreMatchers.is(entity.getPatronymic())))
                 .andExpect(jsonPath("$.lastName", CoreMatchers.is(entity.getLastName())))
                 .andExpect(jsonPath("$.salary").value(entity.getSalary()))
                 .andExpect(jsonPath("$.hiringDate", CoreMatchers.is(entity.getHiringDate().toString())));
@@ -240,7 +238,6 @@ class EmployeeControllerIT extends BaseIT {
                         .queryParams(multiValueMap));
         SearchEmployeeFilter findAllFilter = SearchEmployeeFilter.builder().build();
         Specification<Employee> spec = new EmployeeSpecificationBuilder().buildSearch(findAllFilter, true);
-//        Specification<Employee> spec = SpecBuilder.buildSpec(findAllFilter);
         Page<Employee> byFilter = employeeRepository.findAll(spec, PageRequest.of(0, 10));
         // then
         result.andExpect(status().isNoContent());

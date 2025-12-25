@@ -37,7 +37,9 @@ public @interface MinString {
         }
         @Override
         public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
-            if (value == null) return false;
+            if (value == null) {
+                return false;
+            }
             try {
                 java.math.BigDecimal bdValue = new java.math.BigDecimal(value.toString());
                 return bdValue.compareTo(java.math.BigDecimal.valueOf(minValue)) >= 0;

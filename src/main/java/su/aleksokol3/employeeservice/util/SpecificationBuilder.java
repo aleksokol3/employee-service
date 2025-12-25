@@ -1,6 +1,7 @@
 package su.aleksokol3.employeeservice.util;
 
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;

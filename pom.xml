@@ -9,7 +9,7 @@
     </parent>
     <groupId>su.aleksokol3</groupId>
     <artifactId>employee-service</artifactId>
-    <version>0.13.1</version>
+    <version>0.14.0</version>
     <name>employee-service</name>
     <description>employee-service</description>
     <properties>
@@ -203,7 +203,6 @@
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>${maven-checkstyle-plugin.version}</version>
                 <configuration>
-<!--                    <configLocation>google_checks.xml</configLocation>-->
                     <configLocation>checkstyle.xml</configLocation>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
@@ -219,28 +218,12 @@
                     </execution>
                 </executions>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>com.github.spotbugs</groupId>-->
-<!--                <artifactId>spotbugs-maven-plugin</artifactId>-->
-<!--                <version>${spotbugs-maven-plugin.version}</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>spotbugs-check</id>-->
-<!--                        <phase>verify</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>check</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <effort>Max</effort>-->
-<!--                    <threshold>Low</threshold>-->
-<!--                    <xmlOutput>true</xmlOutput>-->
-<!--                    <xmlOutputDirectory>${project.build.directory}/spotbugs</xmlOutputDirectory>-->
-<!--                    <failOnError>true</failOnError>-->
-<!--                    <includeTests>true</includeTests>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 </project>

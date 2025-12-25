@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import su.aleksokol3.employeeservice.UnitTestBase;
+import su.aleksokol3.employeeservice.BaseRepositoryTest;
 import su.aleksokol3.employeeservice.model.api.filter.DeleteEmployeeFilter;
 import su.aleksokol3.employeeservice.model.api.filter.SearchEmployeeFilter;
 import su.aleksokol3.employeeservice.model.entity.Employee;
@@ -20,9 +20,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//@DataJpaTest
 @RequiredArgsConstructor
-public class EmployeeRepositoryTest extends UnitTestBase {
+public class EmployeeRepositoryTest extends BaseRepositoryTest {
+
     private final EmployeeRepository employeeRepository;
 
     @BeforeEach
@@ -79,7 +79,6 @@ public class EmployeeRepositoryTest extends UnitTestBase {
         SearchEmployeeFilter filter = SearchEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
-//        Specification<Employee> spec = SpecBuilder.buildSpec(filter);
         Specification<Employee> spec = new EmployeeSpecificationBuilder().buildSearch(filter, true);
         Pageable pageable = PageRequest.of(0, 5);
         // when
@@ -149,14 +148,12 @@ public class EmployeeRepositoryTest extends UnitTestBase {
         DeleteEmployeeFilter filter = DeleteEmployeeFilter.builder()
                 .lastName("Alonso")
                 .build();
-//        Specification<Employee> spec = SpecBuilder.buildSpec(filter);
         Specification<Employee> spec = new EmployeeSpecificationBuilder().buildDelete(filter);
 
         // when
         long deleted = employeeRepository.delete(spec);
         SearchEmployeeFilter findAllFilter = SearchEmployeeFilter.builder().build();
         Specification<Employee> specAll = new EmployeeSpecificationBuilder().buildSearch(findAllFilter, true);
-//        Specification<Employee> specAll = SpecBuilder.buildSpec(findAllFilter);
         Page<Employee> byFilter = employeeRepository.findAll(specAll, PageRequest.of(0, 10));
         // then
         assertThat(deleted).isEqualTo(2);

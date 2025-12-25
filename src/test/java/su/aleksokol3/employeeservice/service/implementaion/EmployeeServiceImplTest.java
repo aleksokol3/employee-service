@@ -31,9 +31,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeServiceImplTest {
@@ -115,9 +117,10 @@ class EmployeeServiceImplTest {
         CreateEmployeeDto createDto = DataUtils.getJuanRodriguezCreateDto();
         Employee transientEntity = DataUtils.getJuanRodriguezTransient();
         Employee persistedEntity = DataUtils.getJuanRodriguezPersisted();
-        Mockito.when(employeeMapper.createDtoToEntity(createDto))
-                        .thenReturn(transientEntity);
+        ReadEmployeeDto readEmployeeDto = DataUtils.getJuanRodriguezReadDto();
+        Mockito.when(employeeMapper.createDtoToEntity(createDto)).thenReturn(transientEntity);
         Mockito.when(employeeRepository.save(any(Employee.class))).thenReturn(persistedEntity);
+        Mockito.when(employeeMapper.entityToReadDto(any(Employee.class))).thenReturn(readEmployeeDto);
         // when
         ReadEmployeeDto savedEmployee = serviceUnderTest.create(createDto);
         // then
@@ -148,6 +151,8 @@ class EmployeeServiceImplTest {
         // then
         assertThat(resultReadDto).isNotNull();
         assertThat(resultReadDto.id()).isEqualTo(persistedEntity.getId());
+        assertThat(resultReadDto.patronymic()).isNull();
+        assertThat(resultReadDto.salary()).isEqualTo(updatedPersistedEntity.getSalary());
         verify(employeeRepository, times(1)).findById(any(UUID.class));
         verify(employeeRepository, times(1)).saveAndFlush(any(Employee.class));
     }

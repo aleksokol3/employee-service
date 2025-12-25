@@ -16,5 +16,4 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/changelog-master.yaml
-  profiles:
-    active: dev
+app.version: @project.version@

@@ -1,8 +1,15 @@
 package su.aleksokol3.employeeservice.model.api.dto.employee;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import su.aleksokol3.employeeservice.validation.*;
+import su.aleksokol3.employeeservice.validation.BigDecimal;
+import su.aleksokol3.employeeservice.validation.LocalDate;
+import su.aleksokol3.employeeservice.validation.MinString;
+import su.aleksokol3.employeeservice.validation.NotBlankOrNull;
+import su.aleksokol3.employeeservice.validation.PastOrPresentString;
 
 /**
  * Presentation of employee entity to create a new employee.
@@ -17,30 +24,30 @@ import su.aleksokol3.employeeservice.validation.*;
 @Builder
 public record CreateEmployeeDto(
 
-        @NotBlank(message = "{firstname.not.blank}")
-        @Size(min = 1, max = 256, message = "{firstname.size}")
+        @NotBlank(message = "firstname.not.blank")
+        @Size(min = 1, max = 256, message = "firstname.size")
         String firstName,
 
-        @NotBlankOrNull(message = "{patronymic.not.blank.or.null}")
-        @Size(min = 1, max = 256, message = "{patronymic.size}")
+        @NotBlankOrNull(message = "patronymic.not.blank.or.null")
+        @Size(min = 1, max = 256, message = "patronymic.size")
         String patronymic,
 
-        @NotBlank(message = "{lastname.not.blank}")
-        @Size(min = 1, max = 256, message = "{lastname.size}")
+        @NotBlank(message = "lastname.not.blank")
+        @Size(min = 1, max = 256, message = "lastname.size")
         String lastName,
 
-        @NotNull(message = "{age.not.null}")
-        @Min(value = 1, message = "{age.min}")
+        @NotNull(message = "age.not.null")
+        @Min(value = 1, message = "age.min")
         Integer age,
 
-        @NotNull(message = "{salary.not.null}")
-        @MinString(value = 0, message = "{salary.min}")
-        @BigDecimal(message = "{salary.big.decimal}")
+        @NotNull(message = "salary.not.null")
+        @MinString(value = 0, message = "salary.min")
+        @BigDecimal(message = "salary.big.decimal")
         String salary,
 
-        @NotNull(message = "{hiringdate.not.null}")
-        @PastOrPresentString(message = "{hiringdate.past.or.present}")
-        @LocalDate(message = "{hiringdate.local.date}")
+        @NotNull(message = "hiringdate.not.null")
+        @PastOrPresentString(message = "hiringdate.past.or.present")
+        @LocalDate(message = "hiringdate.local.date")
         String hiringDate
 ) {
 }

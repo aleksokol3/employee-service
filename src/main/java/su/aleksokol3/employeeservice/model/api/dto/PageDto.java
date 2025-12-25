@@ -29,6 +29,14 @@ public class PageDto<T> {
      */
     Instant timestamp;
 
+    /**
+     * creates a new PageDto object from {@link Page}
+     *
+     * @param page {@link Page}
+     * @return new PageDto object
+     * @param <T> type of read DTO
+     */
+
     public static <T> PageDto<T> fromPage(Page<T> page) {
         return new PageDto<>(page.toList(), page.getTotalElements(), Instant.now());
     }

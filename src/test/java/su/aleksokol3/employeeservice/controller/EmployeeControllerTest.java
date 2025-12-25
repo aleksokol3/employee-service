@@ -1,22 +1,21 @@
 package su.aleksokol3.employeeservice.controller;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import su.aleksokol3.employeeservice.config.JsonConfig;
 import su.aleksokol3.employeeservice.model.api.dto.PageDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.CreateEmployeeDto;
 import su.aleksokol3.employeeservice.model.api.dto.employee.PatchEmployeeDto;
@@ -28,32 +27,38 @@ import su.aleksokol3.employeeservice.model.entity.Employee;
 import su.aleksokol3.employeeservice.service.EmployeeService;
 import su.aleksokol3.employeeservice.util.DataUtils;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(EmployeeController.class)     // загружает только указанные контроллеры, вместо всего контекста
+@WebMvcTest(EmployeeController.class)
+@Import(JsonConfig.class)
 @RequiredArgsConstructor
 class EmployeeControllerTest {
 
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
-    private final MessageSource messageSource;
     @MockitoBean
     private EmployeeService employeeService;
-
-    @BeforeEach
-    void setUpObjectMapper() {
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.registerModule(new JsonNullableModule());
-    }
+    @MockitoBean(name = "jpaMappingContext")
+    private JpaMetamodelMappingContext jpaMappingContext;
 
     @Test
     @DisplayName("Test find by id functionality")
@@ -65,16 +70,16 @@ class EmployeeControllerTest {
                 .thenReturn(dto);
         // when
         ResultActions result = mockMvc.perform(
-                get("/api/v1/employees/" + id)
+                get("/api/v1/employees/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON));
         // then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", CoreMatchers.is(dto.id().toString())))
-                .andExpect(jsonPath("$.firstName", CoreMatchers.is(dto.firstName())))
-                .andExpect(jsonPath("$.patronymic", CoreMatchers.is(dto.patronymic())))
-                .andExpect(jsonPath("$.lastName", CoreMatchers.is(dto.lastName())))
-                .andExpect(jsonPath("$.salary").value(dto.salary()))
-                .andExpect(jsonPath("$.hiringDate", CoreMatchers.is(dto.hiringDate().toString())));
+                .andExpect(jsonPath("$.id", is(dto.id().toString())))
+                .andExpect(jsonPath("$.firstName", is(dto.firstName())))
+                .andExpect(jsonPath("$.patronymic", is(dto.patronymic())))
+                .andExpect(jsonPath("$.lastName", is(dto.lastName())))
+                .andExpect(jsonPath("$.salary").value(comparesEqualTo(dto.salary()), BigDecimal.class))
+                .andExpect(jsonPath("$.hiringDate", is(dto.hiringDate().toString())));
     }
 
     @Test
@@ -82,21 +87,18 @@ class EmployeeControllerTest {
     void givenIncorrectId_whenFindById_thenExceptionIsThrown() throws Exception {
         // given
         UUID id = UUID.fromString("11e5eb40-472e-30d2-9591-036287d20258");
-//        String employeeLocalizedName = messageSource.getMessage("employee", new Object[0], Locale.getDefault());
-//        String errorLocalizedMessage = messageSource.getMessage(
-//                  "not.found.exception", new Object[]{employeeLocalizedName, id.toString()}, Locale.getDefault());
         String errorMessage = "not.found.exception";
         Mockito.when(employeeService.findById(any(UUID.class)))
                 .thenThrow(new NotFoundException("not.found.exception", "employee", id.toString()));
         // when
         ResultActions result = mockMvc.perform(
-                get("/api/v1/employees/" + id)
+                get("/api/v1/employees/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .locale(Locale.getDefault()));
         // then
         result.andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.status", CoreMatchers.is(HttpStatus.NOT_FOUND.value())))
-                .andExpect(jsonPath("$.error", CoreMatchers.is(errorMessage)));
+                .andExpect(jsonPath("$.status", is(HttpStatus.NOT_FOUND.value())))
+                .andExpect(jsonPath("$.error", is(errorMessage)));
     }
 
     @Test
@@ -115,9 +117,9 @@ class EmployeeControllerTest {
                                 .content(objectMapper.writeValueAsString(filter)));
         // then
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.employees[0].firstName", CoreMatchers.is("Juan")))
-                .andExpect(jsonPath("$.employees[0].lastName", CoreMatchers.is("Rodriguez")))
-                .andExpect(jsonPath("$.total", CoreMatchers.is(1)));
+                .andExpect(jsonPath("$.employees[0].firstName", is("Juan")))
+                .andExpect(jsonPath("$.employees[0].lastName", is("Rodriguez")))
+                .andExpect(jsonPath("$.total", is(1)));
         verify(employeeService, times(1)).findBy(any(SearchEmployeeFilter.class), any(Pageable.class));
     }
 
@@ -126,7 +128,6 @@ class EmployeeControllerTest {
     void givenCreateEmployeeDto_whenCreateEmployee_thenSuccessResponse() throws Exception {
         // given
         CreateEmployeeDto createDto = DataUtils.getJuanRodriguezCreateDto();
-        Employee entity = DataUtils.getJuanRodriguezPersisted();
         ReadEmployeeDto readDto = DataUtils.getJuanRodriguezReadDto();
         Mockito.when(employeeService.create(any(CreateEmployeeDto.class)))
                 .thenReturn(readDto);
@@ -137,7 +138,13 @@ class EmployeeControllerTest {
                         .content(objectMapper.writeValueAsString(createDto)));
         // then
         result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$", CoreMatchers.is(entity.getId().toString())));
+                .andExpect(jsonPath("$.id", is(readDto.id().toString())))
+                .andExpect(jsonPath("$.firstName", is(readDto.firstName())))
+                .andExpect(jsonPath("$.patronymic", is(readDto.patronymic())))
+                .andExpect(jsonPath("$.lastName", is(readDto.lastName())))
+                .andExpect(jsonPath("$.age", is(readDto.age())))
+                .andExpect(jsonPath("$.salary").value(comparesEqualTo(readDto.salary()), BigDecimal.class))
+                .andExpect(jsonPath("$.hiringDate", is(readDto.hiringDate().toString())));
     }
 
     @Test
@@ -154,26 +161,29 @@ class EmployeeControllerTest {
                         .content(objectMapper.writeValueAsString(invalidCreateDto)));
         // then
         result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status", CoreMatchers.is(HttpStatus.BAD_REQUEST.value())))
-                .andExpect(jsonPath("$.errors", CoreMatchers.notNullValue()));
+                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())))
+                .andExpect(jsonPath("$.errors", notNullValue()));
     }
 
     @Test
     @DisplayName("Test update functionality")
     void givenPatchDto_whenUpdate_thenSuccessResponse() throws Exception {
         // given
-        PatchEmployeeDto patchDto = DataUtils.getJuanRodriguezPatchDto();
         Employee persistedEntity = DataUtils.getJuanRodriguezPersisted();
-        ReadEmployeeDto readDto = DataUtils.getJuanRodriguezUpdatedReadDto();
-        Mockito.when(employeeService.update(any(UUID.class), any(PatchEmployeeDto.class)))
-                .thenReturn(readDto);
+        PatchEmployeeDto patchDto = DataUtils.getJuanRodriguezPatchDto();
+        ReadEmployeeDto updatedReadDto = DataUtils.getJuanRodriguezUpdatedReadDto();
+
+        Mockito.when(employeeService.update(eq(persistedEntity.getId()), any(PatchEmployeeDto.class)))
+                .thenReturn(updatedReadDto);
         // when
         ResultActions result = mockMvc.perform(
-                patch("/api/v1/employees/" + persistedEntity.getId())
+                patch("/api/v1/employees/{id}", persistedEntity.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patchDto)));
         // then
-        result.andExpect(status().isOk())
+        result.andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.patronymic").value(nullValue()))
                 .andExpect(jsonPath("$.salary").value(patchDto.salary().get()));
 
         verify(employeeService, times(1)).update(any(UUID.class), any(PatchEmployeeDto.class));
@@ -187,7 +197,7 @@ class EmployeeControllerTest {
         Mockito.doNothing().when(employeeService).deleteById(any(UUID.class));
         // when
         ResultActions result = mockMvc.perform(
-                delete("/api/v1/employees/" + id)
+                delete("/api/v1/employees/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON));
         // then
         result.andExpect(status().isNoContent());

@@ -26,10 +26,10 @@ public record DeleteEmployeeFilter(
 
         Integer ageTo,
 
-        @LocalDate(message = "{hiringdate.local.date}")
+        @LocalDate(message = "hiringdate.local.date")
         String hiringDateFrom,
 
-        @LocalDate(message = "{hiringdate.local.date}")
+        @LocalDate(message = "hiringdate.local.date")
         String hiringDateTo
 ) {
 }

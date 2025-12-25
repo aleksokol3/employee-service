@@ -5,7 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import org.openapitools.jackson.nullable.JsonNullable;
-import su.aleksokol3.employeeservice.validation.*;
+import su.aleksokol3.employeeservice.validation.BigDecimal;
+import su.aleksokol3.employeeservice.validation.LocalDate;
+import su.aleksokol3.employeeservice.validation.MinString;
+import su.aleksokol3.employeeservice.validation.NotBlankOrNull;
+import su.aleksokol3.employeeservice.validation.PastOrPresentString;
 
 /**
  * Presentation of employee entity to update an employee.
@@ -20,17 +24,17 @@ import su.aleksokol3.employeeservice.validation.*;
 @Builder
 public record PatchEmployeeDto(
 
-        JsonNullable<@NotBlank(message = "{firstname.not.blank}") String> firstName,
+        JsonNullable<@NotBlank(message = "firstname.not.blank") String> firstName,
         JsonNullable<
-                @Size(min = 1, max = 256, message = "{patronymic.size}")
-                @NotBlankOrNull(message = "{patronymic.not.blank.or.null}") String> patronymic,
-        JsonNullable<@NotBlank(message = "{lastname.not.blank}") String> lastName,
-        JsonNullable<@Min(value = 1, message = "{age.min}") Integer> age,
+                @Size(min = 1, max = 256, message = "patronymic.size")
+                @NotBlankOrNull(message = "patronymic.not.blank.or.null") String> patronymic,
+        JsonNullable<@NotBlank(message = "lastname.not.blank") String> lastName,
+        JsonNullable<@Min(value = 1, message = "age.min") Integer> age,
         JsonNullable<
-                @BigDecimal(message = "{salary.big.decimal}")
-                @MinString(value = 0, message = "{salary.min}") String> salary,
+                @BigDecimal(message = "salary.big.decimal")
+                @MinString(value = 0, message = "salary.min") String> salary,
         JsonNullable<
-                @LocalDate(message = "{hiringdate.local.date}")
-                @PastOrPresentString(message = "{hiringdate.past.or.present}") String> hiringDate
+                @LocalDate(message = "hiringdate.local.date")
+                @PastOrPresentString(message = "hiringdate.past.or.present") String> hiringDate
 ) {
 }

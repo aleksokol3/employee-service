@@ -1,7 +1,8 @@
 package su.aleksokol3.employeeservice.model.api.filter;
 
 import lombok.Builder;
-import su.aleksokol3.employeeservice.validation.*;
+import su.aleksokol3.employeeservice.validation.BigDecimal;
+import su.aleksokol3.employeeservice.validation.LocalDate;
 
 /**
  * Filter to search employees
@@ -30,16 +31,16 @@ public record SearchEmployeeFilter(
 
         Integer ageTo,
 
-        @BigDecimal(message = "{salary.big.decimal}")
+        @BigDecimal(message = "salary.big.decimal")
         String salaryFrom,
 
-        @BigDecimal(message = "{salary.big.decimal}")
+        @BigDecimal(message = "salary.big.decimal")
         String salaryTo,
 
-        @LocalDate(message = "{hiringdate.local.date}")
+        @LocalDate(message = "hiringdate.local.date")
         String hiringDateFrom,
 
-        @LocalDate(message = "{hiringdate.local.date}")
+        @LocalDate(message = "hiringdate.local.date")
         String hiringDateTo,
 
         String query

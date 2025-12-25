@@ -29,6 +29,7 @@ class EmployeeMapperTest {
         // then
         assertThat(dto).isNotNull();
         assertThat(dto.id()).isEqualTo(entity.getId());
+        assertThat(dto.salary()).isEqualTo(entity.getSalary());
         assertThat(dto.hiringDate()).isEqualTo(entity.getHiringDate());
     }
 
@@ -41,6 +42,7 @@ class EmployeeMapperTest {
         // then
         assertThat(entity).isNotNull();
         assertThat(entity.getLastName()).isEqualTo(dto.lastName());
+        assertThat(entity.getSalary()).isEqualTo(dto.salary());
         assertThat(entity.getHiringDate()).isEqualTo(dto.hiringDate());
     }
 
