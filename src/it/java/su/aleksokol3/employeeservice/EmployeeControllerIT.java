@@ -91,10 +91,10 @@ class EmployeeControllerIT extends BaseIT {
         Employee entityTransient3 = DataUtils.getMariaAlonsoTransient();
         employeeRepository.saveAll(List.of(entityTransient1, entityTransient2, entityTransient3));
 
-        Map<String, List<String>> map = new HashMap<>();
-        map.put("lastName", List.of("Alonso"));         // ~ searchEmployeeFilter.setLastName("Alonso")
-        map.put("sort", List.of("firstName"));
-        MultiValueMap<String, String> multiValueMap = new MultiValueMapAdapter<>(map);
+        Map<String, List<String>> employeeSearchFilterMap = new HashMap<>();
+        employeeSearchFilterMap.put("lastName", List.of("Alonso"));
+        employeeSearchFilterMap.put("sort", List.of("firstName"));
+        MultiValueMap<String, String> multiValueMap = new MultiValueMapAdapter<>(employeeSearchFilterMap);
         // when
         ResultActions result = mockMvc.perform(
                 get("/api/v1/employees")
@@ -120,8 +120,7 @@ class EmployeeControllerIT extends BaseIT {
                         .content(objectMapper.writeValueAsString(dto)));
         // then
         result.andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").exists());
+                .andExpect(header().exists("location"));
     }
 
     @Test

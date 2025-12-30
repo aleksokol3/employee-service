@@ -117,15 +117,12 @@ class EmployeeServiceImplTest {
         CreateEmployeeDto createDto = DataUtils.getJuanRodriguezCreateDto();
         Employee transientEntity = DataUtils.getJuanRodriguezTransient();
         Employee persistedEntity = DataUtils.getJuanRodriguezPersisted();
-        ReadEmployeeDto readEmployeeDto = DataUtils.getJuanRodriguezReadDto();
         Mockito.when(employeeMapper.createDtoToEntity(createDto)).thenReturn(transientEntity);
         Mockito.when(employeeRepository.save(any(Employee.class))).thenReturn(persistedEntity);
-        Mockito.when(employeeMapper.entityToReadDto(any(Employee.class))).thenReturn(readEmployeeDto);
         // when
-        ReadEmployeeDto savedEmployee = serviceUnderTest.create(createDto);
+        UUID id = serviceUnderTest.create(createDto);
         // then
-        assertThat(savedEmployee).isNotNull();
-        assertThat(savedEmployee.id()).isNotNull();
+        assertThat(id).isNotNull();
     }
 
     @Test

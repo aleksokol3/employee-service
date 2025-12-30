@@ -131,16 +131,16 @@ class EmployeeController {
                     )
             ),
             responses = {
-                    @ApiResponse(responseCode = "201", description = "A new employee is created"),
+                    @ApiResponse(responseCode = "201", description = "ID of the created employee"),
                     @ApiResponse(responseCode = "400", description = "Validation failure", content = @Content)
             }
     )
     @PostMapping
-    public ResponseEntity<ReadEmployeeDto> create(@RequestBody @Valid CreateEmployeeDto dto) {
-        ReadEmployeeDto readEmployeeDto = employeeService.create(dto);
+    public ResponseEntity<Void> create(@RequestBody @Valid CreateEmployeeDto dto) {
+        UUID id = employeeService.create(dto);
         URI location = ServletUriComponentsBuilder.fromCurrentRequestUri()
-                .path("/{id}").buildAndExpand(readEmployeeDto.id()).toUri();
-        return ResponseEntity.created(location).body(readEmployeeDto);
+                .path("/{id}").buildAndExpand(id).toUri();
+        return ResponseEntity.created(location).build();
     }
 
     /**

@@ -39,7 +39,7 @@ public interface EmployeeService {
      * @param dto {@link CreateEmployeeDto} with data to create employee.
      * @return {@link UUID} of creating employee.
      */
-    ReadEmployeeDto create(CreateEmployeeDto dto);
+    UUID create(CreateEmployeeDto dto);
 
     /**
      * Update un employee.

@@ -54,11 +54,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional
     @Override
-    public ReadEmployeeDto create(CreateEmployeeDto dto) {
+    public UUID create(CreateEmployeeDto dto) {
         log.info("Creating new employee: {}", dto);
         Employee employee = employeeMapper.createDtoToEntity(dto);
         Employee savedEmployee = employeeRepository.save(employee);
-        return employeeMapper.entityToReadDto(savedEmployee);
+        return savedEmployee.getId();
     }
 
     @Transactional

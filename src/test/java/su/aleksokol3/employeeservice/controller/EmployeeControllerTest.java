@@ -37,6 +37,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.comparesEqualTo;
+import static org.hamcrest.Matchers.endsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -45,6 +46,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -128,9 +130,9 @@ class EmployeeControllerTest {
     void givenCreateEmployeeDto_whenCreateEmployee_thenSuccessResponse() throws Exception {
         // given
         CreateEmployeeDto createDto = DataUtils.getJuanRodriguezCreateDto();
-        ReadEmployeeDto readDto = DataUtils.getJuanRodriguezReadDto();
+        UUID id = DataUtils.getJuanRodriguezPersisted().getId();
         Mockito.when(employeeService.create(any(CreateEmployeeDto.class)))
-                .thenReturn(readDto);
+                .thenReturn(id);
         // when
         ResultActions result = mockMvc.perform(
                 post("/api/v1/employees")
@@ -138,13 +140,7 @@ class EmployeeControllerTest {
                         .content(objectMapper.writeValueAsString(createDto)));
         // then
         result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(readDto.id().toString())))
-                .andExpect(jsonPath("$.firstName", is(readDto.firstName())))
-                .andExpect(jsonPath("$.patronymic", is(readDto.patronymic())))
-                .andExpect(jsonPath("$.lastName", is(readDto.lastName())))
-                .andExpect(jsonPath("$.age", is(readDto.age())))
-                .andExpect(jsonPath("$.salary").value(comparesEqualTo(readDto.salary()), BigDecimal.class))
-                .andExpect(jsonPath("$.hiringDate", is(readDto.hiringDate().toString())));
+                .andExpect(header().string("location", endsWith("/api/v1/employees/" + id)));
     }
 
     @Test
@@ -152,8 +148,6 @@ class EmployeeControllerTest {
     void givenInvalidCreateEmployeeDto_whenCreateEmployee_thenErrorResponse() throws Exception {
         // given
         CreateEmployeeDto invalidCreateDto = DataUtils.getJuanRodriguezInvalidCreateDto();
-        Mockito.when(employeeService.create(any(CreateEmployeeDto.class)))
-                .thenReturn(null);
         // when
         ResultActions result = mockMvc.perform(
                 post("/api/v1/employees")
